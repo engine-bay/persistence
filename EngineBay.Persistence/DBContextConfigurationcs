@@ -1,0 +1,75 @@
+namespace EngineBay.Persistence
+{
+    using LinqKit;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.DependencyInjection;
+
+    public class DBContextConfiguration<TDbContext, TDbQueryContext, TDbWriteContext>
+        where TDbContext : DbContext
+        where TDbQueryContext : DbContext
+        where TDbWriteContext : DbContext
+    {
+        /// <inheritdoc/>
+
+        public void RegisterDbContexts(IServiceCollection services)
+        {
+            if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CONNECTION_STRING")))
+            {
+                Console.WriteLine("Warning: CONNECTION_STRING not found, using SQLite database.");
+
+                // Register a general purpose db context
+                services.AddDbContext<TDbContext>(
+                    options =>
+                    {
+                        options.UseSqlite("Data Source=engine-api.db;").WithExpressionExpanding();
+                    }, ServiceLifetime.Singleton);
+
+                // Register a read only optimized db context
+                services.AddDbContext<TDbQueryContext>(
+                    options =>
+                    {
+                        options.UseSqlite("Data Source=engine-api.db;")
+                        .WithExpressionExpanding();
+                    }, ServiceLifetime.Singleton);
+
+                // Register a thread safe write optimized db context
+                services.AddDbContext<TDbWriteContext>(
+                    options =>
+                    {
+                        options.UseSqlite("Data Source=engine-api.db;")
+                        .WithExpressionExpanding();
+                    }, ServiceLifetime.Singleton);
+            }
+            else
+            {
+                // Register a general purpose db context that is not pooled
+                services.AddDbContext<TDbContext>(
+                    options =>
+                    {
+                        options.UseSqlServer(Environment.GetEnvironmentVariable("CONNECTION_STRING"), options =>
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                        .WithExpressionExpanding();
+                    });
+
+                // Register a read only optimized db context
+                services.AddDbContextPool<TDbQueryContext>(
+                    options =>
+                    {
+                        options.UseSqlServer(Environment.GetEnvironmentVariable("CONNECTION_STRING"), options =>
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                        .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+                        .WithExpressionExpanding();
+                    });
+
+                // Register a thread safe write optimized db context
+                services.AddDbContextPool<TDbWriteContext>(
+                    options =>
+                    {
+                        options.UseSqlServer(Environment.GetEnvironmentVariable("CONNECTION_STRING"), options =>
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                        .WithExpressionExpanding();
+                    });
+            }
+        }
+    }
+}
