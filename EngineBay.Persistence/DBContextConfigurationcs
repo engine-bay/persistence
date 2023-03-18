@@ -4,6 +4,7 @@ namespace EngineBay.Persistence
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
 
+    /// <inheritdoc/>
     public class DBContextConfiguration<TDbContext, TDbQueryContext, TDbWriteContext>
         where TDbContext : DbContext
         where TDbQueryContext : DbContext
@@ -13,63 +14,121 @@ namespace EngineBay.Persistence
 
         public void RegisterDbContexts(IServiceCollection services)
         {
-            if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CONNECTION_STRING")))
+
+            var databaseProvider = GetDatabaseProvider();
+            var connectionString = GetDatabaseConnectionString(databaseProvider);
+
+            switch (databaseProvider)
             {
-                Console.WriteLine("Warning: CONNECTION_STRING not found, using SQLite database.");
-
-                // Register a general purpose db context
-                services.AddDbContext<TDbContext>(
-                    options =>
-                    {
-                        options.UseSqlite("Data Source=engine-api.db;").WithExpressionExpanding();
-                    }, ServiceLifetime.Singleton);
-
-                // Register a read only optimized db context
-                services.AddDbContext<TDbQueryContext>(
-                    options =>
-                    {
-                        options.UseSqlite("Data Source=engine-api.db;")
-                        .WithExpressionExpanding();
-                    }, ServiceLifetime.Singleton);
-
-                // Register a thread safe write optimized db context
-                services.AddDbContext<TDbWriteContext>(
-                    options =>
-                    {
-                        options.UseSqlite("Data Source=engine-api.db;")
-                        .WithExpressionExpanding();
-                    }, ServiceLifetime.Singleton);
+                case DatabaseProviderTypes.SQLite:
+                    ConfigureSqlite(services, connectionString);
+                    break;
+                case DatabaseProviderTypes.SqlServer:
+                    ConfigureSqlServer(services, connectionString);
+                    break;
+                default:
+                    throw new ArgumentException($"Unhandled DATABASE_PROVIDER configuration of '{databaseProvider}'.");
             }
-            else
+        }
+
+        private void ConfigureSqlServer(IServiceCollection services, string connectionString)
+        {
+            // Register a general purpose db context that is not pooled
+            services.AddDbContext<TDbContext>(
+                options =>
+                {
+                    options.UseSqlServer(connectionString, options =>
+                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                    .WithExpressionExpanding();
+                });
+
+            // Register a read only optimized db context
+            services.AddDbContextPool<TDbQueryContext>(
+                options =>
+                {
+                    options.UseSqlServer(connectionString, options =>
+                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+                    .WithExpressionExpanding();
+                });
+
+            // Register a thread safe write optimized db context
+            services.AddDbContextPool<TDbWriteContext>(
+                options =>
+                {
+                    options.UseSqlServer(connectionString, options =>
+                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                    .WithExpressionExpanding();
+                });
+        }
+
+        private void ConfigureSqlite(IServiceCollection services, string connectionString)
+        {
+            // Register a general purpose db context
+            services.AddDbContext<TDbContext>(
+                options =>
+                {
+                    options.UseSqlite(connectionString).WithExpressionExpanding();
+                }, ServiceLifetime.Singleton);
+
+            // Register a read only optimized db context
+            services.AddDbContext<TDbQueryContext>(
+                options =>
+                {
+                    options.UseSqlite(connectionString)
+                    .WithExpressionExpanding();
+                }, ServiceLifetime.Singleton);
+
+            // Register a thread safe write optimized db context
+            services.AddDbContext<TDbWriteContext>(
+                options =>
+                {
+                    options.UseSqlite(connectionString)
+                    .WithExpressionExpanding();
+                }, ServiceLifetime.Singleton);
+        }
+
+        private DatabaseProviderTypes GetDatabaseProvider()
+        {
+            var databaseProviderEnvironmentVariable = Environment.GetEnvironmentVariable("DATABASE_PROVIDER");
+
+            if (string.IsNullOrEmpty(databaseProviderEnvironmentVariable))
             {
-                // Register a general purpose db context that is not pooled
-                services.AddDbContext<TDbContext>(
-                    options =>
-                    {
-                        options.UseSqlServer(Environment.GetEnvironmentVariable("CONNECTION_STRING"), options =>
-                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-                        .WithExpressionExpanding();
-                    });
-
-                // Register a read only optimized db context
-                services.AddDbContextPool<TDbQueryContext>(
-                    options =>
-                    {
-                        options.UseSqlServer(Environment.GetEnvironmentVariable("CONNECTION_STRING"), options =>
-                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-                        .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
-                        .WithExpressionExpanding();
-                    });
-
-                // Register a thread safe write optimized db context
-                services.AddDbContextPool<TDbWriteContext>(
-                    options =>
-                    {
-                        options.UseSqlServer(Environment.GetEnvironmentVariable("CONNECTION_STRING"), options =>
-                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-                        .WithExpressionExpanding();
-                    });
+                Console.WriteLine("Warning: DATABASE_PROVIDER not configured, using SQLite database.");
+                return DatabaseProviderTypes.SQLite; ;
             }
+
+            var databaseProvider = (DatabaseProviderTypes)Enum.Parse(typeof(DatabaseProviderTypes), databaseProviderEnvironmentVariable);
+
+            if (!Enum.IsDefined(typeof(DatabaseProviderTypes), databaseProvider) | databaseProvider.ToString().Contains(","))
+            {
+                Console.WriteLine($"Warning: '{databaseProviderEnvironmentVariable}' is not a valid DATABASE_PROVIDER configuration option. Valid options are: ");
+                foreach (string name in Enum.GetNames(typeof(DatabaseProviderTypes)))
+                {
+                    Console.Write(name);
+                    Console.Write(", ");
+                }
+                throw new ArgumentException("Invalid DATABASE_PROVIDER configuration.");
+            }
+
+            return databaseProvider;
+
+        }
+
+        private string GetDatabaseConnectionString(DatabaseProviderTypes databaseProvider)
+        {
+            var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+            if (!string.IsNullOrEmpty(connectionString))
+            {
+                return connectionString;
+            }
+            if (databaseProvider == DatabaseProviderTypes.SQLite)
+            {
+                return "Data Source=engine-api.db;";
+            }
+
+            throw new ArgumentException("Invalid CONNECTION_STRING configuration.");
+
         }
     }
 }
