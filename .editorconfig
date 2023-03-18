@@ -2,6 +2,10 @@
 # SA1633: We don't need a C# code file is missing a standard file header.
 dotnet_diagnostic.SA1633.severity = silent
 
+# CA1303: No internationlization requirement, can have string literals
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca1303
+dotnet_diagnostic.CA1303.severity = silent
+
 # CS1591: XML comment documentation is horrible
 dotnet_diagnostic.CS1591.severity = silent
 dotnet_diagnostic.SA1600.severity = silent

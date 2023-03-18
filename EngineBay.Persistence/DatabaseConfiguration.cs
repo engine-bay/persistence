@@ -4,17 +4,13 @@ namespace EngineBay.Persistence
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
 
-    /// <inheritdoc/>
-    public class DBContextConfiguration<TDbContext, TDbQueryContext, TDbWriteContext>
+    public class DatabaseConfiguration<TDbContext, TDbQueryContext, TDbWriteContext>
         where TDbContext : DbContext
         where TDbQueryContext : DbContext
         where TDbWriteContext : DbContext
     {
-        /// <inheritdoc/>
-
-        public void RegisterDbContexts(IServiceCollection services)
+        public void RegisterDatabases(IServiceCollection services)
         {
-
             var databaseProvider = GetDatabaseProvider();
             var connectionString = GetDatabaseConnectionString(databaseProvider);
 
@@ -31,7 +27,7 @@ namespace EngineBay.Persistence
             }
         }
 
-        private void ConfigureSqlServer(IServiceCollection services, string connectionString)
+        private static void ConfigureSqlServer(IServiceCollection services, string connectionString)
         {
             // Register a general purpose db context that is not pooled
             services.AddDbContext<TDbContext>(
@@ -62,7 +58,7 @@ namespace EngineBay.Persistence
                 });
         }
 
-        private void ConfigureSqlite(IServiceCollection services, string connectionString)
+        private static void ConfigureSqlite(IServiceCollection services, string connectionString)
         {
             // Register a general purpose db context
             services.AddDbContext<TDbContext>(
@@ -88,19 +84,19 @@ namespace EngineBay.Persistence
                 }, ServiceLifetime.Singleton);
         }
 
-        private DatabaseProviderTypes GetDatabaseProvider()
+        private static DatabaseProviderTypes GetDatabaseProvider()
         {
             var databaseProviderEnvironmentVariable = Environment.GetEnvironmentVariable("DATABASE_PROVIDER");
 
             if (string.IsNullOrEmpty(databaseProviderEnvironmentVariable))
             {
                 Console.WriteLine("Warning: DATABASE_PROVIDER not configured, using SQLite database.");
-                return DatabaseProviderTypes.SQLite; ;
+                return DatabaseProviderTypes.SQLite;
             }
 
             var databaseProvider = (DatabaseProviderTypes)Enum.Parse(typeof(DatabaseProviderTypes), databaseProviderEnvironmentVariable);
 
-            if (!Enum.IsDefined(typeof(DatabaseProviderTypes), databaseProvider) | databaseProvider.ToString().Contains(","))
+            if (!Enum.IsDefined(typeof(DatabaseProviderTypes), databaseProvider) | databaseProvider.ToString().Contains(',', StringComparison.InvariantCulture))
             {
                 Console.WriteLine($"Warning: '{databaseProviderEnvironmentVariable}' is not a valid DATABASE_PROVIDER configuration option. Valid options are: ");
                 foreach (string name in Enum.GetNames(typeof(DatabaseProviderTypes)))
@@ -108,27 +104,27 @@ namespace EngineBay.Persistence
                     Console.Write(name);
                     Console.Write(", ");
                 }
+
                 throw new ArgumentException("Invalid DATABASE_PROVIDER configuration.");
             }
 
             return databaseProvider;
-
         }
 
-        private string GetDatabaseConnectionString(DatabaseProviderTypes databaseProvider)
+        private static string GetDatabaseConnectionString(DatabaseProviderTypes databaseProvider)
         {
             var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
             if (!string.IsNullOrEmpty(connectionString))
             {
                 return connectionString;
             }
+
             if (databaseProvider == DatabaseProviderTypes.SQLite)
             {
                 return "Data Source=engine-api.db;";
             }
 
             throw new ArgumentException("Invalid CONNECTION_STRING configuration.");
-
         }
     }
 }
