@@ -1,6 +1,7 @@
 namespace EngineBay.Persistence
 {
     using LinqKit;
+    using Microsoft.Data.Sqlite;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
 
@@ -16,6 +17,7 @@ namespace EngineBay.Persistence
 
             switch (databaseProvider)
             {
+                case DatabaseProviderTypes.InMemory:
                 case DatabaseProviderTypes.SQLite:
                     ConfigureSqlite(services, connectionString);
                     break;
@@ -39,7 +41,7 @@ namespace EngineBay.Persistence
                 });
 
             // Register a read only optimized db context
-            services.AddDbContextPool<TDbQueryContext>(
+            services.AddDbContext<TDbQueryContext>(
                 options =>
                 {
                     options.UseSqlServer(connectionString, options =>
@@ -49,7 +51,7 @@ namespace EngineBay.Persistence
                 });
 
             // Register a thread safe write optimized db context
-            services.AddDbContextPool<TDbWriteContext>(
+            services.AddDbContext<TDbWriteContext>(
                 options =>
                 {
                     options.UseSqlServer(connectionString, options =>
@@ -122,6 +124,11 @@ namespace EngineBay.Persistence
             if (databaseProvider == DatabaseProviderTypes.SQLite)
             {
                 return "Data Source=engine-api.db;";
+            }
+
+            if (databaseProvider == DatabaseProviderTypes.InMemory)
+            {
+                return "Filename=:memory:";
             }
 
             throw new ArgumentException("Invalid CONNECTION_STRING configuration.");
