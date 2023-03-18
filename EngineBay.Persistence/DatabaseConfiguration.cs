@@ -1,7 +1,6 @@
 namespace EngineBay.Persistence
 {
     using LinqKit;
-    using Microsoft.Data.SqlClient;
     using Microsoft.Data.Sqlite;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +14,11 @@ namespace EngineBay.Persistence
         {
             var databaseProvider = GetDatabaseProvider();
             var connectionString = GetDatabaseConnectionString(databaseProvider);
+
+            if (!ConnectionStringValidator.IsValid(databaseProvider, connectionString))
+            {
+                throw new ArgumentException("Invalid CONNECTION_STRING configuration.");
+            }
 
             switch (databaseProvider)
             {
@@ -30,48 +34,8 @@ namespace EngineBay.Persistence
             }
         }
 
-        private static bool IsValidSqlServerConnectionString(string connectionString)
-        {
-#pragma warning disable CA1031 // We want to catch any kind of configuration exception thrown here and explicitly not re-throw it
-            try
-            {
-                var connection = new SqlConnection(connectionString);
-                connection.Dispose();
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-#pragma warning restore CA1031
-
-            return true;
-        }
-
-        private static bool IsValidSqliteConnectionString(string connectionString)
-        {
-#pragma warning disable CA1031 // We want to catch any kind of configuration exception thrown here and explicitly not re-throw it
-            try
-            {
-                var connection = new SqliteConnection(connectionString);
-                connection.Dispose();
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-
-            return true;
-#pragma warning restore CA1031
-
-        }
-
         private static void ConfigureSqlServer(IServiceCollection services, string connectionString)
         {
-            if (!IsValidSqlServerConnectionString(connectionString))
-            {
-                throw new ArgumentException("Invalid CONNECTION_STRING configuration.");
-            }
-
             // Register a general purpose db context that is not pooled
             services.AddDbContext<TDbContext>(
                 options =>
@@ -103,11 +67,6 @@ namespace EngineBay.Persistence
 
         private static void ConfigureInMemory(IServiceCollection services, string connectionString)
         {
-            if (!IsValidSqliteConnectionString(connectionString))
-            {
-                throw new ArgumentException("Invalid CONNECTION_STRING configuration.");
-            }
-
 #pragma warning disable CA2000 // We explicitly want to keep this conneciton open so that it is re-used each time by the dependency injection. When this connection is closed, the in-memory db is wiped.
             var connection = new SqliteConnection(connectionString);
 #pragma warning restore CA2000
@@ -144,11 +103,6 @@ namespace EngineBay.Persistence
 
         private static void ConfigureSqlite(IServiceCollection services, string connectionString)
         {
-            if (!IsValidSqliteConnectionString(connectionString))
-            {
-                throw new ArgumentException("Invalid CONNECTION_STRING configuration.");
-            }
-
             // Register a general purpose db context
             services.AddDbContext<TDbContext>(
                 options =>
@@ -207,7 +161,13 @@ namespace EngineBay.Persistence
 
         private static string GetDatabaseConnectionString(DatabaseProviderTypes databaseProvider)
         {
+            if (databaseProvider == DatabaseProviderTypes.InMemory)
+            {
+                return DatabaseConfigurationConstants.DefaultInMemoryConnectiontring;
+            }
+
             var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+
             if (!string.IsNullOrEmpty(connectionString))
             {
                 return connectionString;
@@ -215,12 +175,7 @@ namespace EngineBay.Persistence
 
             if (databaseProvider == DatabaseProviderTypes.SQLite)
             {
-                return "Data Source=engine-api.db;";
-            }
-
-            if (databaseProvider == DatabaseProviderTypes.InMemory)
-            {
-                return "Filename=:memory:";
+                return DatabaseConfigurationConstants.DefaultSqliteConnectiontring;
             }
 
             throw new ArgumentException("Invalid CONNECTION_STRING configuration.");
