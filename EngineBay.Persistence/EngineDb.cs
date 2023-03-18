@@ -9,6 +9,11 @@ namespace EngineBay.Persistence
         {
         }
 
+        public void MasterOnModelCreating(ModelBuilder modelBuilder)
+        {
+            this.OnModelCreating(modelBuilder);
+        }
+
         /// <inheritdoc/>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
