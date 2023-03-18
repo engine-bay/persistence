@@ -12,8 +12,8 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-    <PackageProjectUrl>https://github.com/engine-bay/sheet-functions</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/engine-bay/sheet-functions</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/engine-bay/persistence</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/engine-bay/persistence</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
