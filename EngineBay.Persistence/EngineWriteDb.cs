@@ -146,11 +146,11 @@ namespace EngineBay.Persistence
 
             foreach (var entityEntry in entries)
             {
-                ((BaseModel)entityEntry.Entity).LastUpdatedAt = DateTime.Now;
+                ((BaseModel)entityEntry.Entity).LastUpdatedAt = DateTime.UtcNow;
 
                 if (entityEntry.State == EntityState.Added)
                 {
-                    ((BaseModel)entityEntry.Entity).CreatedAt = DateTime.Now;
+                    ((BaseModel)entityEntry.Entity).CreatedAt = DateTime.UtcNow;
                 }
             }
         }
