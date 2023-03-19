@@ -110,11 +110,6 @@ namespace EngineBay.Persistence
                     throw new ArgumentException("Auditing temporary properties collection was null");
                 }
 
-                if (entry.Changes is null)
-                {
-                    throw new ArgumentException("Auditing change collection was null");
-                }
-
                 var changes = new Dictionary<string, object?>();
 
                 foreach (var prop in entry.TempProperties)
