@@ -1,14 +1,17 @@
 namespace EngineBay.Persistence
 {
-    using Audit.EntityFramework;
+    using System;
     using Microsoft.EntityFrameworkCore;
+    using Newtonsoft.Json;
 
-    public class EngineDb : AuditDbContext, IEngineDb
+    public class EngineDb : DbContext, IEngineDb
     {
         public EngineDb(DbContextOptions options)
             : base(options)
         {
         }
+
+        public DbSet<AuditEntry> AuditEntries { get; set; } = null!;
 
         public void MasterOnModelCreating(ModelBuilder modelBuilder)
         {
@@ -18,6 +21,15 @@ namespace EngineBay.Persistence
         /// <inheritdoc/>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            if (modelBuilder is null)
+            {
+                throw new ArgumentNullException(nameof(modelBuilder));
+            }
+
+            modelBuilder.Entity<AuditEntry>().Property(auditEntry => auditEntry.Changes).HasConversion(
+                value => JsonConvert.SerializeObject(value),
+                serializedValue => JsonConvert.DeserializeObject<Dictionary<string, object?>>(serializedValue));
+
             base.OnModelCreating(modelBuilder);
         }
     }
