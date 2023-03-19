@@ -15,8 +15,6 @@ namespace EngineBay.Persistence
         // public string Username { get; set; }
         public string? EntityId { get; set; }
 
-        public DateTime TimeStamp { get; set; }
-
 #pragma warning disable CA2227 // These properties are not read only as they are set during the auditing process.
         public Dictionary<string, object?>? Changes { get; set; }
 
