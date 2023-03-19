@@ -6,6 +6,7 @@ namespace EngineBay.Persistence
     using Humanizer;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.ChangeTracking;
+    using Newtonsoft.Json;
 
     public class AuditEntry : BaseModel
     {
@@ -43,6 +44,12 @@ namespace EngineBay.Persistence
             modelBuilder.Entity<AuditEntry>().Property(x => x.ActionType).IsRequired();
 
             modelBuilder.Entity<AuditEntry>().Property(x => x.EntityId).IsRequired();
+
+            modelBuilder.Entity<AuditEntry>().Property(x => x.Changes).IsRequired();
+
+            modelBuilder.Entity<AuditEntry>().Property(auditEntry => auditEntry.Changes).HasConversion(
+                value => JsonConvert.SerializeObject(value),
+                serializedValue => JsonConvert.DeserializeObject<Dictionary<string, object?>>(serializedValue));
 
             modelBuilder.Entity<AuditEntry>().Ignore(x => x.TempProperties);
         }
