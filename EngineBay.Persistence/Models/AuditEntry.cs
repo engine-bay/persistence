@@ -17,8 +17,11 @@ namespace EngineBay.Persistence
         // public string Username { get; set; }
         public string? EntityId { get; set; }
 
+        public string? Changes { get; set; }
+
 #pragma warning disable CA2227 // These properties are not read only as they are set during the auditing process.
-        public Dictionary<string, object?>? Changes { get; set; }
+        [NotMapped]
+        public Dictionary<string, object?>? TempChanges { get; set; }
 
         [NotMapped]
         public ICollection<PropertyEntry>? TempProperties { get; set; } // TempProperties are used for properties that are only generated on save, e.g. ID's
@@ -47,11 +50,9 @@ namespace EngineBay.Persistence
 
             modelBuilder.Entity<AuditEntry>().Property(x => x.Changes).IsRequired();
 
-            modelBuilder.Entity<AuditEntry>().Property(auditEntry => auditEntry.Changes).HasConversion(
-                value => JsonConvert.SerializeObject(value),
-                serializedValue => JsonConvert.DeserializeObject<Dictionary<string, object?>>(serializedValue));
-
             modelBuilder.Entity<AuditEntry>().Ignore(x => x.TempProperties);
+
+            modelBuilder.Entity<AuditEntry>().Ignore(x => x.TempChanges);
         }
     }
 }

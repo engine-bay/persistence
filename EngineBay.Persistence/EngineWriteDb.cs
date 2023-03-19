@@ -2,12 +2,19 @@ namespace EngineBay.Persistence
 {
     using EngineBay.Core;
     using Microsoft.EntityFrameworkCore;
+    using Newtonsoft.Json;
 
     public class EngineWriteDb : EngineDb, IEngineQueryDb, IEngineWriteDb
     {
+        private JsonSerializerSettings serializationSettings;
+
         public EngineWriteDb(DbContextOptions<EngineWriteDb> options)
             : base(options)
         {
+            this.serializationSettings = new JsonSerializerSettings()
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            };
         }
 
         /// <inheritdoc/>
@@ -75,10 +82,10 @@ namespace EngineBay.Persistence
 
                     // Username = _username,
                     // TimeStamp = DateTime.UtcNow,
-                    Changes = changes.ToDictionary(i => i.Name, i => i.CurrentValue),
 
                     // TempProperties are properties that are only generated on save, e.g. ID's
                     // These properties will be set correctly after the audited entity has been saved
+                    TempChanges = changes.ToDictionary(i => i.Name, i => i.CurrentValue),
                     TempProperties = entry.Properties.Where(p => p.IsTemporary).ToList(),
                 };
 
@@ -108,21 +115,26 @@ namespace EngineBay.Persistence
                     throw new ArgumentException("Auditing change collection was null");
                 }
 
+                var changes = new Dictionary<string, object?>();
+
                 foreach (var prop in entry.TempProperties)
                 {
                     if (prop.CurrentValue is not null)
                     {
+                        var currentValue = prop.CurrentValue.ToString();
                         if (prop.Metadata.IsPrimaryKey())
                         {
                             entry.EntityId = prop.CurrentValue.ToString();
-                            entry.Changes[prop.Metadata.Name] = prop.CurrentValue;
+                            changes[prop.Metadata.Name] = currentValue;
                         }
                         else
                         {
-                            entry.Changes[prop.Metadata.Name] = prop.CurrentValue;
+                            changes[prop.Metadata.Name] = currentValue;
                         }
                     }
                 }
+
+                entry.Changes = JsonConvert.SerializeObject(changes, this.serializationSettings);
             }
 
             this.AuditEntries.AddRange(auditEntries);
