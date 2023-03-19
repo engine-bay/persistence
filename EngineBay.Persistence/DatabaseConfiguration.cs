@@ -10,11 +10,21 @@ namespace EngineBay.Persistence
     {
         protected override void ConfigureSqlServer(IServiceCollection services, string connectionString)
         {
-            // Register a general purpose db context that is not pooled
             services.AddDbContext<TDbContext>(
                 options =>
                 {
                     options.UseSqlServer(connectionString, options =>
+                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                    .WithExpressionExpanding();
+                });
+        }
+
+        protected override void ConfigurePostgres(IServiceCollection services, string connectionString)
+        {
+            services.AddDbContext<TDbContext>(
+                options =>
+                {
+                    options.UseNpgsql(connectionString, options =>
                         options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                     .WithExpressionExpanding();
                 });
@@ -27,7 +37,6 @@ namespace EngineBay.Persistence
 #pragma warning restore CA2000
             connection.Open();
 
-            // Register a general purpose db context
             services.AddDbContext<TDbContext>(
                 options =>
                 {
@@ -39,7 +48,6 @@ namespace EngineBay.Persistence
 
         protected override void ConfigureSqlite(IServiceCollection services, string connectionString)
         {
-            // Register a general purpose db context
             services.AddDbContext<TDbContext>(
                 options =>
                 {

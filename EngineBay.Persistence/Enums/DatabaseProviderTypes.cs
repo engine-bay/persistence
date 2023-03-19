@@ -5,5 +5,6 @@ namespace EngineBay.Persistence
         InMemory,
         SQLite,
         SqlServer,
+        Postgres,
     }
 }

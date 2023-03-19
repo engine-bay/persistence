@@ -52,12 +52,20 @@ namespace EngineBay.Persistence
                 case DatabaseProviderTypes.SqlServer:
                     this.ConfigureSqlServer(services, connectionString);
                     break;
+                case DatabaseProviderTypes.Postgres:
+                    this.ConfigurePostgres(services, connectionString);
+                    break;
                 default:
                     throw new ArgumentException($"Unhandled DATABASE_PROVIDER configuration of '{databaseProvider}'.");
             }
         }
 
         protected virtual void ConfigureSqlServer(IServiceCollection services, string connectionString)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected virtual void ConfigurePostgres(IServiceCollection services, string connectionString)
         {
             throw new NotImplementedException();
         }

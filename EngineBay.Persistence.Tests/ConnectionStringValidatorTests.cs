@@ -36,6 +36,16 @@ namespace EngineBay.Persistence
         }
 
         [Fact]
+        public void ApostgresConnectionStringIsValid()
+        {
+            var connectionString = "Host=my_host;Database=my_db;Username=my_user;Password=my_pw";
+
+            var isValid = ConnectionStringValidator.IsValid(DatabaseProviderTypes.Postgres, connectionString);
+
+            Assert.True(isValid);
+        }
+
+        [Fact]
         public void TheDefaultSqliteConnectionStringIsValid()
         {
             var connectionString = DatabaseConfigurationConstants.DefaultSqliteConnectiontring;

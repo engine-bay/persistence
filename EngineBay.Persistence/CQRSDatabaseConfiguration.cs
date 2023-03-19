@@ -17,7 +17,7 @@ namespace EngineBay.Persistence
                 options =>
                 {
                     options.UseSqlServer(connectionString, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
                     .WithExpressionExpanding();
                 });
 
@@ -26,7 +26,7 @@ namespace EngineBay.Persistence
                 options =>
                 {
                     options.UseSqlServer(connectionString, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
                     .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
                     .WithExpressionExpanding();
                 });
@@ -36,7 +36,39 @@ namespace EngineBay.Persistence
                 options =>
                 {
                     options.UseSqlServer(connectionString, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
+                    .WithExpressionExpanding();
+                });
+        }
+
+        protected override void ConfigurePostgres(IServiceCollection services, string connectionString)
+        {
+            // Register a general purpose db context that is not pooled
+            services.AddDbContext<TDbContext>(
+                options =>
+                {
+                    options.UseNpgsql(connectionString, options =>
+                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
+
+                    .WithExpressionExpanding();
+                });
+
+            // Register a read only optimized db context
+            services.AddDbContext<TDbQueryContext>(
+                options =>
+                {
+                    options.UseNpgsql(connectionString, options =>
+                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
+                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+                    .WithExpressionExpanding();
+                });
+
+            // Register a thread safe write optimized db context
+            services.AddDbContext<TDbWriteContext>(
+                options =>
+                {
+                    options.UseNpgsql(connectionString, options =>
+                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
                     .WithExpressionExpanding();
                 });
         }

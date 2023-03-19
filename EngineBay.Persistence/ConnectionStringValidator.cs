@@ -2,6 +2,7 @@ namespace EngineBay.Persistence
 {
     using Microsoft.Data.SqlClient;
     using Microsoft.Data.Sqlite;
+    using Npgsql;
 
     public static class ConnectionStringValidator
     {
@@ -19,6 +20,8 @@ namespace EngineBay.Persistence
                     return IsValidSqliteConnectionString(connectionString);
                 case DatabaseProviderTypes.SqlServer:
                     return IsValidSqlServerConnectionString(connectionString);
+                case DatabaseProviderTypes.Postgres:
+                    return IsValidPostgresConnectionString(connectionString);
                 default:
                     return false;
             }
@@ -31,6 +34,22 @@ namespace EngineBay.Persistence
             {
                 var connection = new SqlConnection(connectionString);
                 connection.Dispose();
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+#pragma warning restore CA1031
+
+            return true;
+        }
+
+        private static bool IsValidPostgresConnectionString(string connectionString)
+        {
+#pragma warning disable CA1031 // We want to catch any kind of configuration exception thrown here and explicitly not re-throw it
+            try
+            {
+                var connection = new NpgsqlConnectionStringBuilder(connectionString);
             }
             catch (Exception)
             {
