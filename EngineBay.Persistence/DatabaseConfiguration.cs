@@ -5,36 +5,10 @@ namespace EngineBay.Persistence
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
 
-    public class DatabaseConfiguration<TDbContext, TDbQueryContext, TDbWriteContext>
+    public class DatabaseConfiguration<TDbContext> : BaseDatabaseConfiguration
         where TDbContext : DbContext
-        where TDbQueryContext : DbContext
-        where TDbWriteContext : DbContext
     {
-        public void RegisterDatabases(IServiceCollection services)
-        {
-            var databaseProvider = GetDatabaseProvider();
-            var connectionString = GetDatabaseConnectionString(databaseProvider);
-
-            if (!ConnectionStringValidator.IsValid(databaseProvider, connectionString))
-            {
-                throw new ArgumentException("Invalid CONNECTION_STRING configuration.");
-            }
-
-            switch (databaseProvider)
-            {
-                case DatabaseProviderTypes.InMemory:
-                case DatabaseProviderTypes.SQLite:
-                    ConfigureSqlite(services, connectionString);
-                    break;
-                case DatabaseProviderTypes.SqlServer:
-                    ConfigureSqlServer(services, connectionString);
-                    break;
-                default:
-                    throw new ArgumentException($"Unhandled DATABASE_PROVIDER configuration of '{databaseProvider}'.");
-            }
-        }
-
-        private static void ConfigureSqlServer(IServiceCollection services, string connectionString)
+        protected override void ConfigureSqlServer(IServiceCollection services, string connectionString)
         {
             // Register a general purpose db context that is not pooled
             services.AddDbContext<TDbContext>(
@@ -44,28 +18,9 @@ namespace EngineBay.Persistence
                         options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                     .WithExpressionExpanding();
                 });
-
-            // Register a read only optimized db context
-            services.AddDbContext<TDbQueryContext>(
-                options =>
-                {
-                    options.UseSqlServer(connectionString, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
-                    .WithExpressionExpanding();
-                });
-
-            // Register a thread safe write optimized db context
-            services.AddDbContext<TDbWriteContext>(
-                options =>
-                {
-                    options.UseSqlServer(connectionString, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-                    .WithExpressionExpanding();
-                });
         }
 
-        private static void ConfigureInMemory(IServiceCollection services, string connectionString)
+        protected override void ConfigureInMemory(IServiceCollection services, string connectionString)
         {
 #pragma warning disable CA2000 // We explicitly want to keep this conneciton open so that it is re-used each time by the dependency injection. When this connection is closed, the in-memory db is wiped.
             var connection = new SqliteConnection(connectionString);
@@ -80,28 +35,9 @@ namespace EngineBay.Persistence
                         options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                         .WithExpressionExpanding();
                 }, ServiceLifetime.Singleton);
-
-            // Register a read only optimized db context
-            services.AddDbContext<TDbQueryContext>(
-                options =>
-                {
-                    options.UseSqlite(connection, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
-                    .WithExpressionExpanding();
-                }, ServiceLifetime.Singleton);
-
-            // Register a thread safe write optimized db context
-            services.AddDbContext<TDbWriteContext>(
-                options =>
-                {
-                    options.UseSqlite(connection, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-                    .WithExpressionExpanding();
-                }, ServiceLifetime.Singleton);
         }
 
-        private static void ConfigureSqlite(IServiceCollection services, string connectionString)
+        protected override void ConfigureSqlite(IServiceCollection services, string connectionString)
         {
             // Register a general purpose db context
             services.AddDbContext<TDbContext>(
@@ -111,74 +47,6 @@ namespace EngineBay.Persistence
                         options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                         .WithExpressionExpanding();
                 }, ServiceLifetime.Singleton);
-
-            // Register a read only optimized db context
-            services.AddDbContext<TDbQueryContext>(
-                options =>
-                {
-                    options.UseSqlite(connectionString, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
-                    .WithExpressionExpanding();
-                }, ServiceLifetime.Singleton);
-
-            // Register a thread safe write optimized db context
-            services.AddDbContext<TDbWriteContext>(
-                options =>
-                {
-                    options.UseSqlite(connectionString, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-                    .WithExpressionExpanding();
-                }, ServiceLifetime.Singleton);
-        }
-
-        private static DatabaseProviderTypes GetDatabaseProvider()
-        {
-            var databaseProviderEnvironmentVariable = Environment.GetEnvironmentVariable("DATABASE_PROVIDER");
-
-            if (string.IsNullOrEmpty(databaseProviderEnvironmentVariable))
-            {
-                Console.WriteLine("Warning: DATABASE_PROVIDER not configured, using SQLite database.");
-                return DatabaseProviderTypes.SQLite;
-            }
-
-            var databaseProvider = (DatabaseProviderTypes)Enum.Parse(typeof(DatabaseProviderTypes), databaseProviderEnvironmentVariable);
-
-            if (!Enum.IsDefined(typeof(DatabaseProviderTypes), databaseProvider) | databaseProvider.ToString().Contains(',', StringComparison.InvariantCulture))
-            {
-                Console.WriteLine($"Warning: '{databaseProviderEnvironmentVariable}' is not a valid DATABASE_PROVIDER configuration option. Valid options are: ");
-                foreach (string name in Enum.GetNames(typeof(DatabaseProviderTypes)))
-                {
-                    Console.Write(name);
-                    Console.Write(", ");
-                }
-
-                throw new ArgumentException("Invalid DATABASE_PROVIDER configuration.");
-            }
-
-            return databaseProvider;
-        }
-
-        private static string GetDatabaseConnectionString(DatabaseProviderTypes databaseProvider)
-        {
-            if (databaseProvider == DatabaseProviderTypes.InMemory)
-            {
-                return DatabaseConfigurationConstants.DefaultInMemoryConnectiontring;
-            }
-
-            var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
-
-            if (!string.IsNullOrEmpty(connectionString))
-            {
-                return connectionString;
-            }
-
-            if (databaseProvider == DatabaseProviderTypes.SQLite)
-            {
-                return DatabaseConfigurationConstants.DefaultSqliteConnectiontring;
-            }
-
-            throw new ArgumentException("Invalid CONNECTION_STRING configuration.");
         }
     }
 }
