@@ -38,7 +38,7 @@ namespace EngineBay.Persistence
 
             if (!ConnectionStringValidator.IsValid(databaseProvider, connectionString))
             {
-                throw new ArgumentException("Invalid CONNECTION_STRING configuration.");
+                throw new ArgumentException("Invalid DATABASE_CONNECTION_STRING configuration.");
             }
 
             switch (databaseProvider)
@@ -79,7 +79,7 @@ namespace EngineBay.Persistence
                 return DatabaseConfigurationConstants.DefaultInMemoryConnectiontring;
             }
 
-            var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+            var connectionString = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING");
 
             if (!string.IsNullOrEmpty(connectionString))
             {
@@ -91,7 +91,7 @@ namespace EngineBay.Persistence
                 return DatabaseConfigurationConstants.DefaultSqliteConnectiontring;
             }
 
-            throw new ArgumentException("Invalid CONNECTION_STRING configuration.");
+            throw new ArgumentException("Invalid DATABASE_CONNECTION_STRING configuration.");
         }
     }
 }
