@@ -1,6 +1,7 @@
 namespace EngineBay.Persistence
 {
     using System;
+    using System.ComponentModel.DataAnnotations.Schema;
     using EngineBay.Core;
     using Humanizer;
     using Microsoft.EntityFrameworkCore;
@@ -18,7 +19,8 @@ namespace EngineBay.Persistence
 #pragma warning disable CA2227 // These properties are not read only as they are set during the auditing process.
         public Dictionary<string, object?>? Changes { get; set; }
 
-        public ICollection<PropertyEntry>? TempProperties { get; set; }
+        [NotMapped]
+        public ICollection<PropertyEntry>? TempProperties { get; set; } // TempProperties are used for properties that are only generated on save, e.g. ID's
 
 #pragma warning restore CA2227
         public static new void CreateDataAnnotations(ModelBuilder modelBuilder)
