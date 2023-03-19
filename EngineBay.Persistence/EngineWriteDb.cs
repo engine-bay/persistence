@@ -110,14 +110,17 @@ namespace EngineBay.Persistence
 
                 foreach (var prop in entry.TempProperties)
                 {
-                    if (prop.Metadata.IsPrimaryKey() && prop.CurrentValue is not null)
+                    if (prop.CurrentValue is not null)
                     {
-                        entry.EntityId = prop.CurrentValue.ToString();
-                        entry.Changes[prop.Metadata.Name] = prop.CurrentValue;
-                    }
-                    else
-                    {
-                        entry.Changes[prop.Metadata.Name] = prop.CurrentValue;
+                        if (prop.Metadata.IsPrimaryKey())
+                        {
+                            entry.EntityId = prop.CurrentValue.ToString();
+                            entry.Changes[prop.Metadata.Name] = prop.CurrentValue;
+                        }
+                        else
+                        {
+                            entry.Changes[prop.Metadata.Name] = prop.CurrentValue;
+                        }
                     }
                 }
             }
