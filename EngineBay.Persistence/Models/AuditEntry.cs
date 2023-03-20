@@ -6,7 +6,6 @@ namespace EngineBay.Persistence
     using Humanizer;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.ChangeTracking;
-    using Newtonsoft.Json;
 
     public class AuditEntry : BaseModel
     {

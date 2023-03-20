@@ -20,9 +20,7 @@ namespace EngineBay.Persistence
         /// <inheritdoc/>
         public override int SaveChanges()
         {
-            this.SetTimeStamps();
-
-            return base.SaveChanges();
+            throw new NotImplementedException("Do not call save changes synchronously");
         }
 
         /// <inheritdoc/>
@@ -47,10 +45,18 @@ namespace EngineBay.Persistence
             this.ChangeTracker.DetectChanges();
             var entries = new List<AuditEntry>();
 
-            foreach (var entry in this.ChangeTracker.Entries())
+            var changeTrackerEntries = this.ChangeTracker.Entries();
+
+            foreach (var entry in changeTrackerEntries)
             {
                 // Dot not audit entities that are not tracked, not changed, or not of type IAuditable
                 if (entry.State == EntityState.Detached || entry.State == EntityState.Unchanged || !(entry.Entity is BaseModel))
+                {
+                    continue;
+                }
+
+                // don't audit our audits
+                if (entry.Entity is AuditEntry)
                 {
                     continue;
                 }
@@ -67,6 +73,11 @@ namespace EngineBay.Persistence
                     throw new ArgumentException();
                 }
 
+                if (entityId.CurrentValue is null)
+                {
+                    throw new ArgumentException();
+                }
+
                 var changes = entry.Properties.Select(p => new { p.Metadata.Name, p.CurrentValue });
 
                 if (changes is null)
@@ -76,15 +87,12 @@ namespace EngineBay.Persistence
 
                 var auditEntry = new AuditEntry
                 {
-                    ActionType = entry.State == EntityState.Added ? "INSERT" : entry.State == EntityState.Deleted ? "DELETE" : "UPDATE",
-                    EntityId = entityId.ToString(),
+                    ActionType = entry.State == EntityState.Added ? DatabaseOperationConstants.INSERT : entry.State == EntityState.Deleted ? DatabaseOperationConstants.DELETE : DatabaseOperationConstants.UPDATE,
+                    EntityId = entityId.CurrentValue.ToString(),
                     EntityName = entry.Metadata.ClrType.Name,
 
                     // Username = _username,
                     // TimeStamp = DateTime.UtcNow,
-
-                    // TempProperties are properties that are only generated on save, e.g. ID's
-                    // These properties will be set correctly after the audited entity has been saved
                     TempChanges = changes.ToDictionary(i => i.Name, i => i.CurrentValue),
                     TempProperties = entry.Properties.Where(p => p.IsTemporary).ToList(),
                 };
@@ -103,14 +111,17 @@ namespace EngineBay.Persistence
             }
 
             // For each temporary property in each audit entry - update the value in the audit entry to the actual (generated) value
-            foreach (var entry in auditEntries)
+            Parallel.ForEach(auditEntries, entry =>
             {
                 if (entry.TempProperties is null)
                 {
                     throw new ArgumentException("Auditing temporary properties collection was null");
                 }
 
-                var changes = new Dictionary<string, object?>();
+                if (entry.TempChanges is null)
+                {
+                    throw new ArgumentException("Auditing temporary changes collection was null");
+                }
 
                 foreach (var prop in entry.TempProperties)
                 {
@@ -120,17 +131,17 @@ namespace EngineBay.Persistence
                         if (prop.Metadata.IsPrimaryKey())
                         {
                             entry.EntityId = prop.CurrentValue.ToString();
-                            changes[prop.Metadata.Name] = currentValue;
+                            entry.TempChanges[prop.Metadata.Name] = currentValue;
                         }
                         else
                         {
-                            changes[prop.Metadata.Name] = currentValue;
+                            entry.TempChanges[prop.Metadata.Name] = currentValue;
                         }
                     }
                 }
 
-                entry.Changes = JsonConvert.SerializeObject(changes, this.serializationSettings);
-            }
+                entry.Changes = JsonConvert.SerializeObject(entry.TempChanges, this.serializationSettings);
+            });
 
             this.AuditEntries.AddRange(auditEntries);
             return this.SaveChangesAsync();
@@ -144,7 +155,7 @@ namespace EngineBay.Persistence
                         e.State == EntityState.Added
                         || e.State == EntityState.Modified));
 
-            foreach (var entityEntry in entries)
+            Parallel.ForEach(entries, entityEntry =>
             {
                 ((BaseModel)entityEntry.Entity).LastUpdatedAt = DateTime.UtcNow;
 
@@ -152,7 +163,7 @@ namespace EngineBay.Persistence
                 {
                     ((BaseModel)entityEntry.Entity).CreatedAt = DateTime.UtcNow;
                 }
-            }
+            });
         }
     }
 }
