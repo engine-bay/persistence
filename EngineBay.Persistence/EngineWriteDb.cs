@@ -20,7 +20,18 @@ namespace EngineBay.Persistence
         /// <inheritdoc/>
         public override int SaveChanges()
         {
-            throw new NotImplementedException("Do not call save changes synchronously");
+            this.SetTimeStamps();
+
+            // Get audit entries
+            var auditEntries = this.OnBeforeSaveChanges();
+
+            // Save current entity
+            var result = base.SaveChanges();
+
+            // Save audit entries
+            this.OnAfterSaveChanges(auditEntries);
+
+            return result;
         }
 
         /// <inheritdoc/>
@@ -103,13 +114,8 @@ namespace EngineBay.Persistence
             return entries;
         }
 
-        private Task OnAfterSaveChangesAsync(List<AuditEntry> auditEntries)
+        private List<AuditEntry> UpdateEntryChanges(List<AuditEntry> auditEntries)
         {
-            if (auditEntries == null || auditEntries.Count == 0)
-            {
-                return Task.CompletedTask;
-            }
-
             // For each temporary property in each audit entry - update the value in the audit entry to the actual (generated) value
             Parallel.ForEach(auditEntries, entry =>
             {
@@ -143,8 +149,33 @@ namespace EngineBay.Persistence
                 entry.Changes = JsonConvert.SerializeObject(entry.TempChanges, this.serializationSettings);
             });
 
-            this.AuditEntries.AddRange(auditEntries);
+            return auditEntries;
+        }
+
+        private Task OnAfterSaveChangesAsync(List<AuditEntry> auditEntries)
+        {
+            if (auditEntries == null || auditEntries.Count == 0)
+            {
+                return Task.CompletedTask;
+            }
+
+            var updatedAuditEntries = this.UpdateEntryChanges(auditEntries);
+
+            this.AuditEntries.AddRange(updatedAuditEntries);
             return this.SaveChangesAsync();
+        }
+
+        private void OnAfterSaveChanges(List<AuditEntry> auditEntries)
+        {
+            if (auditEntries == null || auditEntries.Count == 0)
+            {
+                return;
+            }
+
+            var updatedAuditEntries = this.UpdateEntryChanges(auditEntries);
+
+            this.AuditEntries.AddRange(updatedAuditEntries);
+            this.SaveChanges();
         }
 
         private void SetTimeStamps()
