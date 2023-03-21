@@ -87,7 +87,7 @@ namespace EngineBay.Persistence
                     options.UseSqlite(connection, options =>
                         options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                         .WithExpressionExpanding();
-                }, ServiceLifetime.Singleton);
+                });
 
             // Register a read only optimized db context
             services.AddDbContext<TDbQueryContext>(
@@ -97,7 +97,7 @@ namespace EngineBay.Persistence
                         options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                     .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
                     .WithExpressionExpanding();
-                }, ServiceLifetime.Singleton);
+                });
 
             // Register a thread safe write optimized db context
             services.AddDbContext<TDbWriteContext>(
@@ -106,7 +106,7 @@ namespace EngineBay.Persistence
                     options.UseSqlite(connection, options =>
                         options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                     .WithExpressionExpanding();
-                }, ServiceLifetime.Singleton);
+                });
         }
 
         protected override void ConfigureSqlite(IServiceCollection services, string connectionString)
@@ -118,7 +118,7 @@ namespace EngineBay.Persistence
                     options.UseSqlite(connectionString, options =>
                         options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                         .WithExpressionExpanding();
-                }, ServiceLifetime.Singleton);
+                });
 
             // Register a read only optimized db context
             services.AddDbContext<TDbQueryContext>(
@@ -128,7 +128,7 @@ namespace EngineBay.Persistence
                         options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                     .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
                     .WithExpressionExpanding();
-                }, ServiceLifetime.Singleton);
+                });
 
             // Register a thread safe write optimized db context
             services.AddDbContext<TDbWriteContext>(
@@ -137,7 +137,7 @@ namespace EngineBay.Persistence
                     options.UseSqlite(connectionString, options =>
                         options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                     .WithExpressionExpanding();
-                }, ServiceLifetime.Singleton);
+                });
         }
     }
 }
