@@ -13,7 +13,10 @@ namespace EngineBay.Persistence
 
         public string? ActionType { get; set; }
 
-        // public string Username { get; set; }
+        public string? ApplicationUserId { get; set; }
+
+        public virtual ApplicationUser? ApplicationUser { get; set; }
+
         public string? EntityId { get; set; }
 
         public string? Changes { get; set; }
@@ -48,6 +51,10 @@ namespace EngineBay.Persistence
             modelBuilder.Entity<AuditEntry>().Property(x => x.EntityId).IsRequired();
 
             modelBuilder.Entity<AuditEntry>().Property(x => x.Changes).IsRequired();
+
+            modelBuilder.Entity<AuditEntry>().Property(x => x.ApplicationUserId).IsRequired();
+
+            modelBuilder.Entity<AuditEntry>().HasOne(x => x.ApplicationUser);
 
             modelBuilder.Entity<AuditEntry>().Ignore(x => x.TempProperties);
 

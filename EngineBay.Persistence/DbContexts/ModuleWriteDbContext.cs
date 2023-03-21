@@ -4,13 +4,13 @@ namespace EngineBay.Persistence
     using Microsoft.EntityFrameworkCore;
     using Newtonsoft.Json;
 
-    public class EngineWriteDb : EngineDb, IEngineQueryDb, IEngineWriteDb
+    public class ModuleWriteDbContext : ModuleDbContext, IModuleQueryDbContext, IModuleWriteDbContext
     {
         private JsonSerializerSettings serializationSettings;
 
         private bool auditingEnabled;
 
-        public EngineWriteDb(DbContextOptions<EngineWriteDb> options)
+        public ModuleWriteDbContext(DbContextOptions<ModuleWriteDbContext> options)
             : base(options)
         {
             this.serializationSettings = new JsonSerializerSettings()
@@ -26,14 +26,25 @@ namespace EngineBay.Persistence
         {
             this.SetTimeStamps();
 
+            return base.SaveChanges();
+        }
+
+        public int SaveChanges(ApplicationUser user)
+        {
+            if (user is null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            this.SetAuditedTimeStamps(user);
+
             if (!this.auditingEnabled)
             {
-                Console.WriteLine("Audting was disabled?");
                 return base.SaveChanges();
             }
 
             // Get audit entries
-            var auditEntries = this.OnBeforeSaveChanges();
+            var auditEntries = this.OnBeforeSaveChanges(user);
 
             // Save current entity
             var result = base.SaveChanges();
@@ -45,18 +56,22 @@ namespace EngineBay.Persistence
         }
 
         /// <inheritdoc/>
-        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        public async Task<int> SaveChangesAsync(ApplicationUser user, CancellationToken cancellationToken = default)
         {
-            this.SetTimeStamps();
+            if (user is null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            this.SetAuditedTimeStamps(user);
 
             if (!this.auditingEnabled)
             {
-                Console.WriteLine("Audting was disabled?");
                 return await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
 
             // Get audit entries
-            var auditEntries = this.OnBeforeSaveChanges();
+            var auditEntries = this.OnBeforeSaveChanges(user);
 
             // Save current entity
             var result = await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -67,8 +82,21 @@ namespace EngineBay.Persistence
             return result;
         }
 
-        private List<AuditEntry> OnBeforeSaveChanges()
+        /// <inheritdoc/>
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
+            this.SetTimeStamps();
+
+            return await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        private List<AuditEntry> OnBeforeSaveChanges(ApplicationUser user)
+        {
+            if (user is null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
             this.ChangeTracker.DetectChanges();
             var entries = new List<AuditEntry>();
 
@@ -90,26 +118,26 @@ namespace EngineBay.Persistence
 
                 if (entry.Properties is null)
                 {
-                    throw new ArgumentException();
+                    throw new ArgumentException("Auditing change tracker entry properties were null");
                 }
 
                 var entityId = entry.Properties.Single(p => p.Metadata.IsPrimaryKey());
 
                 if (entityId is null)
                 {
-                    throw new ArgumentException();
+                    throw new ArgumentException("Auditing change tracker entry entityId was null");
                 }
 
                 if (entityId.CurrentValue is null)
                 {
-                    throw new ArgumentException();
+                    throw new ArgumentException("Auditing change tracker entry current value was null");
                 }
 
                 var changes = entry.Properties.Select(p => new { p.Metadata.Name, p.CurrentValue });
 
                 if (changes is null)
                 {
-                    throw new ArgumentException();
+                    throw new ArgumentException("Auditing change tracker entry changes were null");
                 }
 
                 var auditEntry = new AuditEntry
@@ -117,9 +145,8 @@ namespace EngineBay.Persistence
                     ActionType = entry.State == EntityState.Added ? DatabaseOperationConstants.INSERT : entry.State == EntityState.Deleted ? DatabaseOperationConstants.DELETE : DatabaseOperationConstants.UPDATE,
                     EntityId = entityId.CurrentValue.ToString(),
                     EntityName = entry.Metadata.ClrType.Name,
-
-                    // Username = _username,
-                    // TimeStamp = DateTime.UtcNow,
+                    ApplicationUserId = user.Id,
+                    ApplicationUser = user,
                     TempChanges = changes.ToDictionary(i => i.Name, i => i.CurrentValue),
                     TempProperties = entry.Properties.Where(p => p.IsTemporary).ToList(),
                 };
@@ -192,6 +219,29 @@ namespace EngineBay.Persistence
 
             this.AuditEntries.AddRange(updatedAuditEntries);
             this.SaveChanges();
+        }
+
+        private void SetAuditedTimeStamps(ApplicationUser user)
+        {
+            var entries = this.ChangeTracker
+                .Entries()
+                .Where(e => e.Entity is AuditableModel && (
+                        e.State == EntityState.Added
+                        || e.State == EntityState.Modified));
+
+            Parallel.ForEach(entries, entityEntry =>
+            {
+                ((AuditableModel)entityEntry.Entity).LastUpdatedAt = DateTime.UtcNow;
+                ((AuditableModel)entityEntry.Entity).LastUpdatedById = user.Id;
+                ((AuditableModel)entityEntry.Entity).LastUpdatedBy = user;
+
+                if (entityEntry.State == EntityState.Added)
+                {
+                    ((AuditableModel)entityEntry.Entity).CreatedAt = DateTime.UtcNow;
+                    ((AuditableModel)entityEntry.Entity).CreatedById = user.Id;
+                    ((AuditableModel)entityEntry.Entity).CreatedBy = user;
+                }
+            });
         }
 
         private void SetTimeStamps()

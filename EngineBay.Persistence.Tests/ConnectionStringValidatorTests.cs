@@ -1,6 +1,5 @@
-namespace EngineBay.Persistence
+namespace EngineBay.Persistence.Tests
 {
-    using System.Data;
     using Xunit;
 
     public class ConnectionStringValidatorTests

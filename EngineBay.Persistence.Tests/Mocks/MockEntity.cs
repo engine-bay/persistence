@@ -1,6 +1,5 @@
-namespace EngineBay.Persistence
+namespace EngineBay.Persistence.Tests
 {
-    using EngineBay.Core;
     using Humanizer;
     using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +21,14 @@ namespace EngineBay.Persistence
             modelBuilder.Entity<MockEntity>().Property(x => x.CreatedAt).IsRequired();
 
             modelBuilder.Entity<MockEntity>().Property(x => x.LastUpdatedAt).IsRequired();
+
+            modelBuilder.Entity<MockEntity>().Property(x => x.CreatedById).IsRequired();
+
+            modelBuilder.Entity<MockEntity>().HasOne(x => x.CreatedBy);
+
+            modelBuilder.Entity<MockEntity>().Property(x => x.LastUpdatedById).IsRequired();
+
+            modelBuilder.Entity<MockEntity>().HasOne(x => x.LastUpdatedBy);
 
             modelBuilder.Entity<MockEntity>().Property(x => x.Name).IsRequired();
         }
