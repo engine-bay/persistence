@@ -31,6 +31,29 @@ namespace EngineBay.Persistence
             return databaseProvider;
         }
 
+        public static bool IsAuditingEnabled()
+        {
+            var auditingEnabledEnvironmentVariable = Environment.GetEnvironmentVariable(ConfigurationConstants.DATABASEAUDITINGENABLED);
+
+            if (string.IsNullOrEmpty(auditingEnabledEnvironmentVariable))
+            {
+                return true;
+            }
+
+            bool auditingEnabled;
+            if (bool.TryParse(auditingEnabledEnvironmentVariable, out auditingEnabled))
+            {
+                if (!auditingEnabled)
+                {
+                    Console.WriteLine($"Warning: Auditing has been disabled by {ConfigurationConstants.DATABASEAUDITINGENABLED} configuration.");
+                }
+
+                return auditingEnabled;
+            }
+
+            throw new ArgumentException($"Invalid {ConfigurationConstants.DATABASEAUDITINGENABLED} configuration.");
+        }
+
         public void RegisterDatabases(IServiceCollection services)
         {
             var databaseProvider = GetDatabaseProvider();

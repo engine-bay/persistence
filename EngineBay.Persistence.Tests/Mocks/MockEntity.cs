@@ -4,7 +4,7 @@ namespace EngineBay.Persistence
     using Humanizer;
     using Microsoft.EntityFrameworkCore;
 
-    public class MockEntity : BaseModel
+    public class MockEntity : AuditableModel
     {
         public string? Name { get; set; }
 

@@ -8,6 +8,8 @@ namespace EngineBay.Persistence
     {
         private JsonSerializerSettings serializationSettings;
 
+        private bool auditingEnabled;
+
         public EngineWriteDb(DbContextOptions<EngineWriteDb> options)
             : base(options)
         {
@@ -15,12 +17,20 @@ namespace EngineBay.Persistence
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             };
+
+            this.auditingEnabled = BaseDatabaseConfiguration.IsAuditingEnabled();
         }
 
         /// <inheritdoc/>
         public override int SaveChanges()
         {
             this.SetTimeStamps();
+
+            if (!this.auditingEnabled)
+            {
+                Console.WriteLine("Audting was disabled?");
+                return base.SaveChanges();
+            }
 
             // Get audit entries
             var auditEntries = this.OnBeforeSaveChanges();
@@ -38,6 +48,12 @@ namespace EngineBay.Persistence
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             this.SetTimeStamps();
+
+            if (!this.auditingEnabled)
+            {
+                Console.WriteLine("Audting was disabled?");
+                return await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            }
 
             // Get audit entries
             var auditEntries = this.OnBeforeSaveChanges();
@@ -60,8 +76,8 @@ namespace EngineBay.Persistence
 
             foreach (var entry in changeTrackerEntries)
             {
-                // Dot not audit entities that are not tracked, not changed, or not of type IAuditable
-                if (entry.State == EntityState.Detached || entry.State == EntityState.Unchanged || !(entry.Entity is BaseModel))
+                // Dot not audit entities that are not tracked, not changed, or not of type AuditableModel
+                if (entry.State == EntityState.Detached || entry.State == EntityState.Unchanged || !(entry.Entity is AuditableModel))
                 {
                     continue;
                 }
