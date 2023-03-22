@@ -103,7 +103,7 @@ namespace EngineBay.Persistence
             throw new NotImplementedException();
         }
 
-        private static string GetDatabaseConnectionString(DatabaseProviderTypes databaseProvider)
+        public static string GetDatabaseConnectionString(DatabaseProviderTypes databaseProvider)
         {
             if (databaseProvider == DatabaseProviderTypes.InMemory)
             {
