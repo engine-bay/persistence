@@ -54,6 +54,28 @@ namespace EngineBay.Persistence
             throw new ArgumentException($"Invalid {ConfigurationConstants.DATABASEAUDITINGENABLED} configuration.");
         }
 
+        public static string GetDatabaseConnectionString(DatabaseProviderTypes databaseProvider)
+        {
+            if (databaseProvider == DatabaseProviderTypes.InMemory)
+            {
+                return DatabaseConfigurationConstants.DefaultInMemoryConnectiontring;
+            }
+
+            var connectionString = Environment.GetEnvironmentVariable(ConfigurationConstants.DATABASECONNECTIONSTRING);
+
+            if (!string.IsNullOrEmpty(connectionString))
+            {
+                return connectionString;
+            }
+
+            if (databaseProvider == DatabaseProviderTypes.SQLite)
+            {
+                return DatabaseConfigurationConstants.DefaultSqliteConnectiontring;
+            }
+
+            throw new ArgumentException($"Invalid {ConfigurationConstants.DATABASECONNECTIONSTRING} configuration.");
+        }
+
         public void RegisterDatabases(IServiceCollection services)
         {
             var databaseProvider = GetDatabaseProvider();
@@ -101,28 +123,6 @@ namespace EngineBay.Persistence
         protected virtual void ConfigureSqlite(IServiceCollection services, string connectionString)
         {
             throw new NotImplementedException();
-        }
-
-        public static string GetDatabaseConnectionString(DatabaseProviderTypes databaseProvider)
-        {
-            if (databaseProvider == DatabaseProviderTypes.InMemory)
-            {
-                return DatabaseConfigurationConstants.DefaultInMemoryConnectiontring;
-            }
-
-            var connectionString = Environment.GetEnvironmentVariable(ConfigurationConstants.DATABASECONNECTIONSTRING);
-
-            if (!string.IsNullOrEmpty(connectionString))
-            {
-                return connectionString;
-            }
-
-            if (databaseProvider == DatabaseProviderTypes.SQLite)
-            {
-                return DatabaseConfigurationConstants.DefaultSqliteConnectiontring;
-            }
-
-            throw new ArgumentException($"Invalid {ConfigurationConstants.DATABASECONNECTIONSTRING} configuration.");
         }
     }
 }
