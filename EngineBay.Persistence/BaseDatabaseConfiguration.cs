@@ -6,11 +6,11 @@ namespace EngineBay.Persistence
     {
         public static DatabaseProviderTypes GetDatabaseProvider()
         {
-            var databaseProviderEnvironmentVariable = Environment.GetEnvironmentVariable(ConfigurationConstants.DATABASEPROVIDER);
+            var databaseProviderEnvironmentVariable = Environment.GetEnvironmentVariable(EnvironmentVariableConstants.DATABASEPROVIDER);
 
             if (string.IsNullOrEmpty(databaseProviderEnvironmentVariable))
             {
-                Console.WriteLine($"Warning: {ConfigurationConstants.DATABASEPROVIDER} not configured, using SQLite database.");
+                Console.WriteLine($"Warning: {EnvironmentVariableConstants.DATABASEPROVIDER} not configured, using {DatabaseProviderTypes.SQLite} database.");
                 return DatabaseProviderTypes.SQLite;
             }
 
@@ -18,22 +18,64 @@ namespace EngineBay.Persistence
 
             if (!Enum.IsDefined(typeof(DatabaseProviderTypes), databaseProvider) | databaseProvider.ToString().Contains(',', StringComparison.InvariantCulture))
             {
-                Console.WriteLine($"Warning: '{databaseProviderEnvironmentVariable}' is not a valid {ConfigurationConstants.DATABASEPROVIDER} configuration option. Valid options are: ");
+                Console.WriteLine($"Warning: '{databaseProviderEnvironmentVariable}' is not a valid {EnvironmentVariableConstants.DATABASEPROVIDER} configuration option. Valid options are: ");
                 foreach (string name in Enum.GetNames(typeof(DatabaseProviderTypes)))
                 {
                     Console.Write(name);
                     Console.Write(", ");
                 }
 
-                throw new ArgumentException($"Invalid {ConfigurationConstants.DATABASEPROVIDER} configuration.");
+                throw new ArgumentException($"Invalid {EnvironmentVariableConstants.DATABASEPROVIDER} configuration.");
             }
 
             return databaseProvider;
         }
 
+        public static bool IsDatabaseReset()
+        {
+            var databaseProvider = GetDatabaseProvider();
+            if (databaseProvider == DatabaseProviderTypes.InMemory)
+            {
+                Console.WriteLine($"Warning: {EnvironmentVariableConstants.DATABASEPROVIDER} was set to '{DatabaseProviderTypes.InMemory}', setting {EnvironmentVariableConstants.DATABASERESET} to 'true'.");
+                return true;
+            }
+
+            var databaseResetString = Environment.GetEnvironmentVariable(EnvironmentVariableConstants.DATABASERESET);
+
+            if (string.IsNullOrEmpty(databaseResetString))
+            {
+                return false;
+            }
+
+            if (databaseResetString == "true")
+            {
+                Console.WriteLine($"Warning: {EnvironmentVariableConstants.DATABASERESET} was set to 'true', this will RESET the database to default. I hope you know what you're doing...");
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool IsDatabaseReseeded()
+        {
+            var databaseReseedString = Environment.GetEnvironmentVariable(EnvironmentVariableConstants.DATABASERESEED);
+
+            if (string.IsNullOrEmpty(databaseReseedString))
+            {
+                return false;
+            }
+
+            if (databaseReseedString == "true")
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         public static bool IsAuditingEnabled()
         {
-            var auditingEnabledEnvironmentVariable = Environment.GetEnvironmentVariable(ConfigurationConstants.DATABASEAUDITINGENABLED);
+            var auditingEnabledEnvironmentVariable = Environment.GetEnvironmentVariable(EnvironmentVariableConstants.DATABASEAUDITINGENABLED);
 
             if (string.IsNullOrEmpty(auditingEnabledEnvironmentVariable))
             {
@@ -45,23 +87,24 @@ namespace EngineBay.Persistence
             {
                 if (!auditingEnabled)
                 {
-                    Console.WriteLine($"Warning: Auditing has been disabled by {ConfigurationConstants.DATABASEAUDITINGENABLED} configuration.");
+                    Console.WriteLine($"Warning: Auditing has been disabled by {EnvironmentVariableConstants.DATABASEAUDITINGENABLED} configuration.");
                 }
 
                 return auditingEnabled;
             }
 
-            throw new ArgumentException($"Invalid {ConfigurationConstants.DATABASEAUDITINGENABLED} configuration.");
+            throw new ArgumentException($"Invalid {EnvironmentVariableConstants.DATABASEAUDITINGENABLED} configuration.");
         }
 
-        public static string GetDatabaseConnectionString(DatabaseProviderTypes databaseProvider)
+        public static string GetDatabaseConnectionString()
         {
+            var databaseProvider = GetDatabaseProvider();
             if (databaseProvider == DatabaseProviderTypes.InMemory)
             {
-                return DatabaseConfigurationConstants.DefaultInMemoryConnectiontring;
+                return DefaultConnectionStringConstants.DefaultInMemoryConnectiontring;
             }
 
-            var connectionString = Environment.GetEnvironmentVariable(ConfigurationConstants.DATABASECONNECTIONSTRING);
+            var connectionString = Environment.GetEnvironmentVariable(EnvironmentVariableConstants.DATABASECONNECTIONSTRING);
 
             if (!string.IsNullOrEmpty(connectionString))
             {
@@ -70,20 +113,20 @@ namespace EngineBay.Persistence
 
             if (databaseProvider == DatabaseProviderTypes.SQLite)
             {
-                return DatabaseConfigurationConstants.DefaultSqliteConnectiontring;
+                return DefaultConnectionStringConstants.DefaultSqliteConnectiontring;
             }
 
-            throw new ArgumentException($"Invalid {ConfigurationConstants.DATABASECONNECTIONSTRING} configuration.");
+            throw new ArgumentException($"Invalid {EnvironmentVariableConstants.DATABASECONNECTIONSTRING} configuration.");
         }
 
         public void RegisterDatabases(IServiceCollection services)
         {
             var databaseProvider = GetDatabaseProvider();
-            var connectionString = GetDatabaseConnectionString(databaseProvider);
+            var connectionString = GetDatabaseConnectionString();
 
             if (!ConnectionStringValidator.IsValid(databaseProvider, connectionString))
             {
-                throw new ArgumentException($"Invalid {ConfigurationConstants.DATABASECONNECTIONSTRING} configuration.");
+                throw new ArgumentException($"Invalid {EnvironmentVariableConstants.DATABASECONNECTIONSTRING} configuration.");
             }
 
             switch (databaseProvider)
@@ -101,7 +144,7 @@ namespace EngineBay.Persistence
                     this.ConfigurePostgres(services, connectionString);
                     break;
                 default:
-                    throw new ArgumentException($"Unhandled {ConfigurationConstants.DATABASEPROVIDER} configuration of '{databaseProvider}'.");
+                    throw new ArgumentException($"Unhandled {EnvironmentVariableConstants.DATABASEPROVIDER} configuration of '{databaseProvider}'.");
             }
         }
 

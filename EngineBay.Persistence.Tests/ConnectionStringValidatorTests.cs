@@ -47,7 +47,7 @@ namespace EngineBay.Persistence.Tests
         [Fact]
         public void TheDefaultSqliteConnectionStringIsValid()
         {
-            var connectionString = DatabaseConfigurationConstants.DefaultSqliteConnectiontring;
+            var connectionString = DefaultConnectionStringConstants.DefaultSqliteConnectiontring;
 
             var isValid = ConnectionStringValidator.IsValid(DatabaseProviderTypes.SQLite, connectionString);
 
@@ -57,7 +57,7 @@ namespace EngineBay.Persistence.Tests
         [Fact]
         public void TheDefaultInMemoryConnectionStringIsValid()
         {
-            var connectionString = DatabaseConfigurationConstants.DefaultInMemoryConnectiontring;
+            var connectionString = DefaultConnectionStringConstants.DefaultInMemoryConnectiontring;
 
             var isValid = ConnectionStringValidator.IsValid(DatabaseProviderTypes.SQLite, connectionString);
 

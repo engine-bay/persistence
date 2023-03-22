@@ -14,7 +14,7 @@ namespace EngineBay.Persistence.Tests
 
         public AuditingTests()
         {
-            Environment.SetEnvironmentVariable(ConfigurationConstants.DATABASEPROVIDER, "InMemory");
+            Environment.SetEnvironmentVariable(EnvironmentVariableConstants.DATABASEPROVIDER, "InMemory");
 
             var services = new ServiceCollection();
 
