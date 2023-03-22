@@ -5,7 +5,12 @@ namespace EngineBay.Persistence
 
     public class ModuleDbContext : IdentityDbContext<ApplicationUser>, IModuleDbContext
     {
-        public ModuleDbContext(DbContextOptions options)
+        public ModuleDbContext(DbContextOptions<ModuleDbContext> options)
+            : base(options)
+        {
+        }
+
+        protected ModuleDbContext(DbContextOptions options)
             : base(options)
         {
         }
