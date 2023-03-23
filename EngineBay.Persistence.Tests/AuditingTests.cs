@@ -50,7 +50,7 @@ namespace EngineBay.Persistence.Tests
                 throw new ArgumentException();
             }
 
-            var applicationUser = new ApplicationUser();
+            var applicationUser = new MockApplicationUser();
 
             this.auditedDbContext.MockEntities.Add(this.mockEntity);
 
@@ -74,7 +74,7 @@ namespace EngineBay.Persistence.Tests
                 throw new ArgumentException();
             }
 
-            var applicationUser = new ApplicationUser();
+            var applicationUser = new MockApplicationUser();
 
             this.auditedDbContext.MockEntities.Add(this.mockEntity);
 
@@ -98,7 +98,7 @@ namespace EngineBay.Persistence.Tests
                 throw new ArgumentException();
             }
 
-            var applicationUser = new ApplicationUser();
+            var applicationUser = new MockApplicationUser();
 
             this.auditedDbContext.MockEntities.Add(this.mockEntity);
 
@@ -122,7 +122,7 @@ namespace EngineBay.Persistence.Tests
                 throw new ArgumentException();
             }
 
-            var applicationUser = new ApplicationUser();
+            var applicationUser = new MockApplicationUser();
 
             this.auditedDbContext.MockEntities.Add(this.mockEntity);
 
@@ -146,7 +146,7 @@ namespace EngineBay.Persistence.Tests
                 throw new ArgumentException();
             }
 
-            var applicationUser = new ApplicationUser();
+            var applicationUser = new MockApplicationUser();
 
             this.auditedDbContext.MockEntities.Add(this.mockEntity);
 
@@ -170,7 +170,7 @@ namespace EngineBay.Persistence.Tests
                 throw new ArgumentException();
             }
 
-            var applicationUser = new ApplicationUser();
+            var applicationUser = new MockApplicationUser();
 
             this.auditedDbContext.MockEntities.Add(this.mockEntity);
 
@@ -194,7 +194,7 @@ namespace EngineBay.Persistence.Tests
                 throw new ArgumentException();
             }
 
-            var applicationUser = new ApplicationUser();
+            var applicationUser = new MockApplicationUser();
 
             this.auditedDbContext.MockEntities.Add(this.mockEntity);
 

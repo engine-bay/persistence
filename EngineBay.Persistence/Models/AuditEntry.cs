@@ -13,7 +13,7 @@ namespace EngineBay.Persistence
 
         public string? ActionType { get; set; }
 
-        public string? ApplicationUserId { get; set; }
+        public Guid? ApplicationUserId { get; set; }
 
         public virtual ApplicationUser? ApplicationUser { get; set; }
 

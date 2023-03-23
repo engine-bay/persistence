@@ -1,9 +1,8 @@
 namespace EngineBay.Persistence
 {
-    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
 
-    public class ModuleDbContext : IdentityDbContext<ApplicationUser>, IModuleDbContext
+    public class ModuleDbContext : DbContext, IModuleDbContext
     {
         public ModuleDbContext(DbContextOptions<ModuleDbContext> options)
             : base(options)
@@ -17,15 +16,17 @@ namespace EngineBay.Persistence
 
         public DbSet<AuditEntry> AuditEntries { get; set; } = null!;
 
-        public void MasterOnModelCreating(ModelBuilder builder)
+        public void MasterOnModelCreating(ModelBuilder modelBuilder)
         {
-            this.OnModelCreating(builder);
+            this.OnModelCreating(modelBuilder);
         }
 
         /// <inheritdoc/>
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(builder);
+            base.OnModelCreating(modelBuilder);
+
+            ApplicationUser.CreateDataAnnotations(modelBuilder);
         }
     }
 }

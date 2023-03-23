@@ -11,11 +11,11 @@ namespace EngineBay.Persistence.Tests
 
         public DbSet<MockEntity> MockEntities { get; set; } = null!;
 
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            MockEntity.CreateDataAnnotations(builder);
+            MockEntity.CreateDataAnnotations(modelBuilder);
 
-            base.OnModelCreating(builder);
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

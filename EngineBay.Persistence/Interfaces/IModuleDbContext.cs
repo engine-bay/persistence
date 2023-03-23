@@ -4,6 +4,6 @@ namespace EngineBay.Persistence
 
     public partial interface IModuleDbContext : IDisposable
     {
-        public void MasterOnModelCreating(ModelBuilder builder);
+        public void MasterOnModelCreating(ModelBuilder modelBuilder);
     }
 }
