@@ -16,6 +16,8 @@ namespace EngineBay.Persistence
 
         public DbSet<AuditEntry> AuditEntries { get; set; } = null!;
 
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; } = null!;
+
         public void MasterOnModelCreating(ModelBuilder modelBuilder)
         {
             this.OnModelCreating(modelBuilder);
@@ -26,6 +28,7 @@ namespace EngineBay.Persistence
         {
             base.OnModelCreating(modelBuilder);
 
+            AuditEntry.CreateDataAnnotations(modelBuilder);
             ApplicationUser.CreateDataAnnotations(modelBuilder);
         }
     }
