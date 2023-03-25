@@ -67,6 +67,7 @@ namespace EngineBay.Persistence
 
             if (databaseReseedString == "true")
             {
+                Console.WriteLine($"Warning: {EnvironmentVariableConstants.DATABASERESEED} was set to 'true', this will attempt to insert default data into the database. I hope you know what you're doing...");
                 return true;
             }
 
