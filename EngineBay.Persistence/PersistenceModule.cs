@@ -9,9 +9,6 @@ namespace EngineBay.Persistence
     {
         public IServiceCollection RegisterModule(IServiceCollection services, IConfiguration configuration)
         {
-            services.AddTransient<GetApplicationUser>();
-            services.AddTransient<GetCurrentUser>();
-
             return services;
         }
 

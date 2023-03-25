@@ -26,10 +26,10 @@ namespace EngineBay.Persistence
         /// <inheritdoc/>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
-
             AuditEntry.CreateDataAnnotations(modelBuilder);
             ApplicationUser.CreateDataAnnotations(modelBuilder);
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }
