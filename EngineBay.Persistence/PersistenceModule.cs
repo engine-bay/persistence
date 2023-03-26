@@ -16,5 +16,10 @@ namespace EngineBay.Persistence
         {
             return endpoints;
         }
+
+        public WebApplication AddMiddleware(WebApplication app)
+        {
+            return app;
+        }
     }
 }
