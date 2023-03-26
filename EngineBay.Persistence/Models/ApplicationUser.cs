@@ -5,7 +5,7 @@ namespace EngineBay.Persistence
 
     public class ApplicationUser : AuditableModel
     {
-        public string? Name { get; set; }
+        public string? Username { get; set; }
 
         public static new void CreateDataAnnotations(ModelBuilder modelBuilder)
         {
@@ -30,7 +30,9 @@ namespace EngineBay.Persistence
 
             modelBuilder.Entity<ApplicationUser>().Ignore(x => x.LastUpdatedBy);
 
-            modelBuilder.Entity<ApplicationUser>().Property(x => x.Name).IsRequired();
+            modelBuilder.Entity<ApplicationUser>().Property(x => x.Username).IsRequired();
+
+            modelBuilder.Entity<ApplicationUser>().HasIndex(x => x.Username).IsUnique();
         }
     }
 }
