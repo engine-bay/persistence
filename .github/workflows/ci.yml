@@ -38,7 +38,7 @@ jobs:
       env:
         CC_TEST_REPORTER_ID: c446fec35062589f55dd444094d515bd29e715e771e9e2c969fcf340017833cc
       with:
-        coverageLocations: ${{github.workspace}}/code-coverage/Clover.xml:clover
+        coverageLocations: ${{github.workspace}}/Clover.xml:clover
   analyze:
     needs: [ build ]
     name: Analyze
