@@ -4,7 +4,7 @@ namespace EngineBay.Persistence
     using Microsoft.EntityFrameworkCore;
     using Newtonsoft.Json;
 
-    public class ModuleWriteDbContext : ModuleDbContext, IModuleQueryDbContext, IModuleWriteDbContext
+    public class ModuleWriteDbContext : ModuleDbContext, IModuleWriteDbContext
     {
         private JsonSerializerSettings serializationSettings;
 
