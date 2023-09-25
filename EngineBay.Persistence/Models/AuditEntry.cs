@@ -15,7 +15,7 @@ namespace EngineBay.Persistence
 
         public Guid? ApplicationUserId { get; set; }
 
-        public virtual ApplicationUser? ApplicationUser { get; set; }
+        public string? ApplicationUserName { get; set; }
 
         public string? EntityId { get; set; }
 
@@ -54,7 +54,7 @@ namespace EngineBay.Persistence
 
             modelBuilder.Entity<AuditEntry>().Property(x => x.ApplicationUserId).IsRequired();
 
-            modelBuilder.Entity<AuditEntry>().HasOne(x => x.ApplicationUser);
+            modelBuilder.Entity<AuditEntry>().Property(x => x.ApplicationUserName).IsRequired();
 
             modelBuilder.Entity<AuditEntry>().Ignore(x => x.TempProperties);
 

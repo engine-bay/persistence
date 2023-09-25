@@ -146,7 +146,7 @@ namespace EngineBay.Persistence
                     EntityId = entityId.CurrentValue.ToString(),
                     EntityName = entry.Metadata.ClrType.Name,
                     ApplicationUserId = user.Id,
-                    ApplicationUser = user,
+                    ApplicationUserName = user.Username,
                     TempChanges = changes.ToDictionary(i => i.Name, i => i.CurrentValue),
                     TempProperties = entry.Properties.Where(p => p.IsTemporary).ToList(),
                 };
