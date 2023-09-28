@@ -11,5 +11,9 @@ namespace EngineBay.Persistence
         public const string DATABASERESET = "DATABASE_RESET";
 
         public const string DATABASERESEED = "DATABASE_RESEED";
+
+        public const string DATABASEEXITAFTERMIGRATIONS = "DATABASE_EXIT_AFTER_MIGRATIONS";
+
+        public const string DATABASEEXITAFTERSEEDING = "DATABASE_EXIT_AFTER_SEEDING";
     }
 }
