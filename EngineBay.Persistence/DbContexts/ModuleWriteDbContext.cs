@@ -67,17 +67,17 @@ namespace EngineBay.Persistence
 
             if (!this.auditingEnabled)
             {
-                return await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                return await base.SaveChangesAsync(cancellationToken);
             }
 
             // Get audit entries
             var auditEntries = this.OnBeforeSaveChanges(user);
 
             // Save current entity
-            var result = await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            var result = await base.SaveChangesAsync(cancellationToken);
 
             // Save audit entries
-            await this.OnAfterSaveChangesAsync(auditEntries).ConfigureAwait(false);
+            await this.OnAfterSaveChangesAsync(auditEntries);
 
             return result;
         }
@@ -87,7 +87,7 @@ namespace EngineBay.Persistence
         {
             this.SetTimeStamps();
 
-            return await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            return await base.SaveChangesAsync(cancellationToken);
         }
 
         private List<AuditEntry> OnBeforeSaveChanges(ApplicationUser user)

@@ -54,7 +54,7 @@ namespace EngineBay.Persistence.Tests
 
             this.auditedDbContext.MockEntities.Add(this.mockEntity);
 
-            await this.auditedDbContext.SaveChangesAsync(applicationUser).ConfigureAwait(false);
+            await this.auditedDbContext.SaveChangesAsync(applicationUser);
 
             var savedMockEntity = this.auditedDbContext.MockEntities.First();
 
@@ -78,7 +78,7 @@ namespace EngineBay.Persistence.Tests
 
             this.auditedDbContext.MockEntities.Add(this.mockEntity);
 
-            await this.auditedDbContext.SaveChangesAsync(applicationUser).ConfigureAwait(false);
+            await this.auditedDbContext.SaveChangesAsync(applicationUser);
 
             var savedMockEntity = this.auditedDbContext.MockEntities.First();
 
@@ -102,7 +102,7 @@ namespace EngineBay.Persistence.Tests
 
             this.auditedDbContext.MockEntities.Add(this.mockEntity);
 
-            await this.auditedDbContext.SaveChangesAsync(applicationUser).ConfigureAwait(false);
+            await this.auditedDbContext.SaveChangesAsync(applicationUser);
 
             var savedMockEntity = this.auditedDbContext.MockEntities.First();
 
@@ -126,7 +126,7 @@ namespace EngineBay.Persistence.Tests
 
             this.auditedDbContext.MockEntities.Add(this.mockEntity);
 
-            await this.auditedDbContext.SaveChangesAsync(applicationUser).ConfigureAwait(false);
+            await this.auditedDbContext.SaveChangesAsync(applicationUser);
 
             var savedMockEntity = this.auditedDbContext.MockEntities.First();
 
@@ -150,7 +150,7 @@ namespace EngineBay.Persistence.Tests
 
             this.auditedDbContext.MockEntities.Add(this.mockEntity);
 
-            await this.auditedDbContext.SaveChangesAsync(applicationUser).ConfigureAwait(false);
+            await this.auditedDbContext.SaveChangesAsync(applicationUser);
 
             var savedMockEntity = this.auditedDbContext.MockEntities.First();
 
@@ -174,7 +174,7 @@ namespace EngineBay.Persistence.Tests
 
             this.auditedDbContext.MockEntities.Add(this.mockEntity);
 
-            await this.auditedDbContext.SaveChangesAsync(applicationUser).ConfigureAwait(false);
+            await this.auditedDbContext.SaveChangesAsync(applicationUser);
 
             var auditEntry = this.auditedDbContext.AuditEntries.First();
 
@@ -198,17 +198,17 @@ namespace EngineBay.Persistence.Tests
 
             this.auditedDbContext.MockEntities.Add(this.mockEntity);
 
-            await this.auditedDbContext.SaveChangesAsync(applicationUser).ConfigureAwait(false);
+            await this.auditedDbContext.SaveChangesAsync(applicationUser);
 
             var savedMockEntity = this.auditedDbContext.MockEntities.First();
 
             savedMockEntity.Name = "Bye world!";
 
-            await this.auditedDbContext.SaveChangesAsync(applicationUser).ConfigureAwait(false);
+            await this.auditedDbContext.SaveChangesAsync(applicationUser);
 
             this.auditedDbContext.MockEntities.Remove(savedMockEntity);
 
-            await this.auditedDbContext.SaveChangesAsync(applicationUser).ConfigureAwait(false);
+            await this.auditedDbContext.SaveChangesAsync(applicationUser);
 
             var auditEntries = this.auditedDbContext.AuditEntries.
                 Where(x => x.EntityId == savedMockEntity.Id.ToString())
