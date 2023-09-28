@@ -47,7 +47,7 @@ namespace EngineBay.Persistence
                 return false;
             }
 
-            if (databaseResetString == "true")
+            if (databaseResetString.ToUpperInvariant() == "TRUE")
             {
                 Console.WriteLine($"Warning: {EnvironmentVariableConstants.DATABASERESET} was set to 'true', this will RESET the database to default. I hope you know what you're doing...");
                 return true;
@@ -65,9 +65,45 @@ namespace EngineBay.Persistence
                 return false;
             }
 
-            if (databaseReseedString == "true")
+            if (databaseReseedString.ToUpperInvariant() == "TRUE")
             {
                 Console.WriteLine($"Warning: {EnvironmentVariableConstants.DATABASERESEED} was set to 'true', this will attempt to insert default data into the database. I hope you know what you're doing...");
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool ShouldExitAfterMigrations()
+        {
+            var exitAfterMigrationsString = Environment.GetEnvironmentVariable(EnvironmentVariableConstants.DATABASEEXITAFTERMIGRATIONS);
+
+            if (string.IsNullOrEmpty(exitAfterMigrationsString))
+            {
+                return false;
+            }
+
+            if (exitAfterMigrationsString.ToUpperInvariant() == "TRUE")
+            {
+                Console.WriteLine($"Warning: {EnvironmentVariableConstants.DATABASEEXITAFTERMIGRATIONS} was set to 'true', this will exit the process once database migrations have been applied.");
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool ShouldExitAfterSeeding()
+        {
+            var exitAfterSeedingString = Environment.GetEnvironmentVariable(EnvironmentVariableConstants.DATABASEEXITAFTERSEEDING);
+
+            if (string.IsNullOrEmpty(exitAfterSeedingString))
+            {
+                return false;
+            }
+
+            if (exitAfterSeedingString.ToUpperInvariant() == "TRUE")
+            {
+                Console.WriteLine($"Warning: {EnvironmentVariableConstants.DATABASEEXITAFTERSEEDING} was set to 'true', this will exit the process once database seed data has been inserted.");
                 return true;
             }
 
