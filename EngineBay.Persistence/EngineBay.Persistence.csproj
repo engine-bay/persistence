@@ -27,10 +27,17 @@
     <IsTrimmable>false</IsTrimmable>
   </PropertyGroup>
 
+  <ItemGroup Condition="$(Configuration)=='Debug'">
+    <ProjectReference Include="../../core/EngineBay.Core/EngineBay.Core.csproj" />
+    <ProjectReference Include="../../logging/EngineBay.Logging/EngineBay.Logging.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="$(Configuration)!='Debug'">
+    <PackageReference Include="EngineBay.Core" Version="6.1.0" />
+    <PackageReference Include="EngineBay.Logging" Version="2.0.0" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Humanizer.Core" Version="2.14.1" />
-    <PackageReference Include="EngineBay.Logging" Version="2.0.0" />
-    <PackageReference Include="EngineBay.Core" Version="6.1.0" />
     <PackageReference Include="LinqKit.Microsoft.EntityFrameworkCore" Version="7.1.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.11" />
