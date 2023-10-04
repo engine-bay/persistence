@@ -1,6 +1,5 @@
 namespace EngineBay.Persistence.Tests
 {
-    using EngineBay.Core;
     using Microsoft.Extensions.DependencyInjection;
     using Xunit;
 

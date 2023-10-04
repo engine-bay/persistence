@@ -5,7 +5,7 @@ namespace EngineBay.Persistence
 
     public class ApplicationUser : AuditableModel
     {
-        public string? Username { get; set; }
+        required public string Username { get; set; }
 
         public static new void CreateDataAnnotations(ModelBuilder modelBuilder)
         {
