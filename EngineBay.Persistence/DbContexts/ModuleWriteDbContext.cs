@@ -2,22 +2,14 @@ namespace EngineBay.Persistence
 {
     using EngineBay.Core;
     using Microsoft.EntityFrameworkCore;
-    using Newtonsoft.Json;
 
     public class ModuleWriteDbContext : ModuleDbContext, IModuleWriteDbContext
     {
-        private JsonSerializerSettings serializationSettings;
-
-        private bool auditingEnabled;
+        private readonly bool auditingEnabled;
 
         public ModuleWriteDbContext(DbContextOptions<ModuleWriteDbContext> options)
             : base(options)
         {
-            this.serializationSettings = new JsonSerializerSettings()
-            {
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-            };
-
             this.auditingEnabled = BaseDatabaseConfiguration.IsAuditingEnabled();
         }
 
