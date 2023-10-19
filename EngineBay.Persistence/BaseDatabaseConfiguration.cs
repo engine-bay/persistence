@@ -16,7 +16,7 @@ namespace EngineBay.Persistence
 
             var databaseProvider = (DatabaseProviderTypes)Enum.Parse(typeof(DatabaseProviderTypes), databaseProviderEnvironmentVariable);
 
-            if (!Enum.IsDefined(typeof(DatabaseProviderTypes), databaseProvider) | databaseProvider.ToString().Contains(',', StringComparison.InvariantCulture))
+            if (!Enum.IsDefined(typeof(DatabaseProviderTypes), databaseProvider) || databaseProvider.ToString().Contains(',', StringComparison.InvariantCulture))
             {
                 Console.WriteLine($"Warning: '{databaseProviderEnvironmentVariable}' is not a valid {EnvironmentVariableConstants.DATABASEPROVIDER} configuration option. Valid options are: ");
                 foreach (string name in Enum.GetNames(typeof(DatabaseProviderTypes)))

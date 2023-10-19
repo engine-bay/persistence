@@ -4,9 +4,12 @@ namespace EngineBay.Persistence
 
     public class ModuleWriteDbContext : ModuleDbContext, IModuleWriteDbContext
     {
-        public ModuleWriteDbContext(DbContextOptions<ModuleWriteDbContext> options)
+        private readonly TimestampInterceptor timestampInterceptor;
+
+        public ModuleWriteDbContext(DbContextOptions<ModuleWriteDbContext> options, TimestampInterceptor timestampInterceptor)
             : base(options)
         {
+            this.timestampInterceptor = timestampInterceptor;
         }
 
         /// <inheritdoc/>
@@ -29,6 +32,15 @@ namespace EngineBay.Persistence
         public Task<int> SaveChangesAsync(ApplicationUser user, CancellationToken cancellationToken = default)
         {
             return this.SaveChangesAsync(cancellationToken);
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            ArgumentNullException.ThrowIfNull(optionsBuilder);
+
+            optionsBuilder.AddInterceptors(this.timestampInterceptor);
+
+            base.OnConfiguring(optionsBuilder);
         }
     }
 }

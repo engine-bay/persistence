@@ -4,8 +4,8 @@ namespace EngineBay.Persistence.Tests
 
     public class MockModuleDbContext : ModuleWriteDbContext, IModuleWriteDbContext
     {
-        public MockModuleDbContext(DbContextOptions<ModuleWriteDbContext> options)
-       : base(options)
+        public MockModuleDbContext(DbContextOptions<ModuleWriteDbContext> options, TimestampInterceptor timestampInterceptor)
+       : base(options, timestampInterceptor)
         {
         }
 

@@ -4,7 +4,8 @@ namespace EngineBay.Persistence.Tests
     {
         public MockApplicationUser()
         {
-            this.Username = Guid.NewGuid().ToString();
+            this.Id = Guid.NewGuid();
+            this.Username = "MockUser";
             this.CreatedById = default(Guid);
             this.LastUpdatedById = default(Guid);
         }

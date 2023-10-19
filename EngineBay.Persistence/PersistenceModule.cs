@@ -9,6 +9,8 @@ namespace EngineBay.Persistence
     {
         public IServiceCollection RegisterModule(IServiceCollection services, IConfiguration configuration)
         {
+            services.AddTransient<TimestampInterceptor>();
+
             return services;
         }
 

@@ -1,52 +1,134 @@
 namespace EngineBay.Persistence.Tests
 {
-    using Microsoft.Extensions.DependencyInjection;
+    using EngineBay.Persistence.Tests.Mocks;
+    using Microsoft.EntityFrameworkCore;
     using Xunit;
 
     public class PersistenceTests
     {
-        private readonly MockModuleDbContext? auditedDbContext;
+        private readonly MockModuleDbContext dbContext;
 
-        private readonly MockEntity? mockEntity;
+        private readonly ApplicationUser applicationUser;
+
+        private readonly DateTime now = DateTime.UtcNow.AddSeconds(-1);
 
         public PersistenceTests()
         {
             Environment.SetEnvironmentVariable(EnvironmentVariableConstants.DATABASEPROVIDER, "InMemory");
 
-            var services = new ServiceCollection();
+            var dbContextOptions = new DbContextOptionsBuilder<ModuleWriteDbContext>()
+                    .UseInMemoryDatabase(nameof(PersistenceTests))
+                    .EnableSensitiveDataLogging()
+            .Options;
 
-            var databaseConfiguration = new DatabaseConfiguration<ModuleWriteDbContext>();
-            databaseConfiguration.RegisterDatabases(services);
+            this.applicationUser = new MockApplicationUser();
+            var currentIdentity = new MockCurrentIdentity(this.applicationUser);
+            var timestampIntercetor = new TimestampInterceptor(currentIdentity);
 
-            var mockDatabaseConfiguration = new DatabaseConfiguration<MockModuleDbContext>();
-            mockDatabaseConfiguration.RegisterDatabases(services);
+            var context = new MockModuleDbContext(dbContextOptions, timestampIntercetor);
+            ArgumentNullException.ThrowIfNull(context);
 
-            var serviceProvider = services.BuildServiceProvider();
+            this.dbContext = context;
+            this.dbContext.Database.EnsureDeleted();
+            this.dbContext.Database.EnsureCreated();
 
-            this.auditedDbContext = serviceProvider.GetRequiredService<MockModuleDbContext>();
-
-            this.auditedDbContext.Database.EnsureDeleted();
-            this.auditedDbContext.Database.EnsureCreated();
-
-            this.mockEntity = new MockEntity
-            {
-                Name = "Hello world!",
-            };
+            this.dbContext.ApplicationUsers.Add(this.applicationUser);
+            this.dbContext.SaveChanges();
         }
 
         [Fact]
         public async Task CanSaveChanges()
         {
-            ArgumentNullException.ThrowIfNull(this.auditedDbContext);
-            ArgumentNullException.ThrowIfNull(this.mockEntity);
+            ArgumentNullException.ThrowIfNull(this.dbContext);
 
-            this.auditedDbContext.MockEntities.Add(this.mockEntity);
+            var entity = new MockEntity()
+            {
+                Name = "Test",
+            };
 
-            await this.auditedDbContext.SaveChangesAsync().ConfigureAwait(false);
+            this.dbContext.MockEntities.Add(entity);
 
-            var savedMockEntity = this.auditedDbContext.MockEntities.First();
+            await this.dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+            var savedMockEntity = this.dbContext.MockEntities.First();
 
             Assert.NotNull(savedMockEntity);
+        }
+
+        [Fact]
+        public async Task SetsTheCreatedDate()
+        {
+            ArgumentNullException.ThrowIfNull(this.dbContext);
+
+            var entity = new MockEntity()
+            {
+                Name = "Test",
+            };
+
+            this.dbContext.MockEntities.Add(entity);
+
+            await this.dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+            var savedMockEntity = this.dbContext.MockEntities.First();
+
+            Assert.True(savedMockEntity.CreatedAt.Ticks > this.now.Ticks);
+        }
+
+        [Fact]
+        public async Task SetsTheLastModifiedDate()
+        {
+            ArgumentNullException.ThrowIfNull(this.dbContext);
+
+            var entity = new MockEntity()
+            {
+                Name = "Test",
+            };
+
+            this.dbContext.MockEntities.Add(entity);
+
+            await this.dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+            var savedMockEntity = this.dbContext.MockEntities.First();
+
+            Assert.True(savedMockEntity.LastUpdatedAt.Ticks > this.now.Ticks);
+        }
+
+        [Fact]
+        public async Task SetsTheLastModifiedByUserId()
+        {
+            ArgumentNullException.ThrowIfNull(this.dbContext);
+
+            var entity = new MockEntity()
+            {
+                Name = "Test",
+            };
+
+            this.dbContext.MockEntities.Add(entity);
+
+            await this.dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+            var savedMockEntity = this.dbContext.MockEntities.First();
+
+            Assert.Equal(this.applicationUser.Id, savedMockEntity.LastUpdatedById);
+        }
+
+        [Fact]
+        public async Task SetsTheCreatedByUserId()
+        {
+            ArgumentNullException.ThrowIfNull(this.dbContext);
+
+            var entity = new MockEntity()
+            {
+                Name = "Test",
+            };
+
+            this.dbContext.MockEntities.Add(entity);
+
+            await this.dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+            var savedMockEntity = this.dbContext.MockEntities.First();
+
+            Assert.Equal(this.applicationUser.Id, savedMockEntity.CreatedById);
         }
     }
 }

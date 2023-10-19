@@ -4,8 +4,8 @@ namespace EngineBay.Persistence
 
     public class ModuleDbContext : DbContext, IModuleDbContext
     {
-        public ModuleDbContext(DbContextOptions<ModuleDbContext> options)
-            : base(options)
+        public ModuleDbContext(DbContextOptions<ModuleDbContext> options, TimestampInterceptor timestampInterceptor)
+            : base(options, timestampInterceptor)
         {
         }
 
