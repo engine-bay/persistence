@@ -14,14 +14,15 @@ namespace EngineBay.Persistence
         protected override void ConfigureSqlServer(IServiceCollection services, string connectionString)
         {
             var sensativeDataLoggingEnabled = LoggingConfiguration.IsSensativeDataLoggingEnabled();
+            var timestampInterceptor = new TimestampInterceptor();
 
             // Register a general purpose db context that is not pooled
             services.AddDbContext<TDbContext>(
                 options =>
                 {
                     options.UseSqlServer(connectionString, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
-                    .WithExpressionExpanding();
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
+                        .WithExpressionExpanding();
 
                     if (sensativeDataLoggingEnabled)
                     {
@@ -35,9 +36,9 @@ namespace EngineBay.Persistence
                 options =>
                 {
                     options.UseSqlServer(connectionString, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
-                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
-                    .WithExpressionExpanding();
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
+                        .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+                        .WithExpressionExpanding();
 
                     if (sensativeDataLoggingEnabled)
                     {
@@ -51,8 +52,9 @@ namespace EngineBay.Persistence
                 options =>
                 {
                     options.UseSqlServer(connectionString, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
-                    .WithExpressionExpanding();
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
+                        .WithExpressionExpanding()
+                        .AddInterceptors(timestampInterceptor);
 
                     if (sensativeDataLoggingEnabled)
                     {
@@ -71,7 +73,7 @@ namespace EngineBay.Persistence
                 options =>
                 {
                     options.UseNpgsql(connectionString, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
                         .WithExpressionExpanding();
 
                     if (sensativeDataLoggingEnabled)
@@ -86,9 +88,9 @@ namespace EngineBay.Persistence
                 options =>
                 {
                     options.UseNpgsql(connectionString, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
-                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
-                    .WithExpressionExpanding();
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
+                        .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+                        .WithExpressionExpanding();
 
                     if (sensativeDataLoggingEnabled)
                     {
@@ -102,8 +104,8 @@ namespace EngineBay.Persistence
                 options =>
                 {
                     options.UseNpgsql(connectionString, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
-                    .WithExpressionExpanding();
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
+                        .WithExpressionExpanding();
 
                     if (sensativeDataLoggingEnabled)
                     {
@@ -126,7 +128,7 @@ namespace EngineBay.Persistence
                 options =>
                 {
                     options.UseSqlite(connection, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                         .WithExpressionExpanding();
 
                     if (sensativeDataLoggingEnabled)
@@ -141,9 +143,9 @@ namespace EngineBay.Persistence
                 options =>
                 {
                     options.UseSqlite(connection, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
-                    .WithExpressionExpanding();
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                        .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+                        .WithExpressionExpanding();
 
                     if (sensativeDataLoggingEnabled)
                     {
@@ -157,8 +159,8 @@ namespace EngineBay.Persistence
                 options =>
                 {
                     options.UseSqlite(connection, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-                    .WithExpressionExpanding();
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                        .WithExpressionExpanding();
 
                     if (sensativeDataLoggingEnabled)
                     {
@@ -177,7 +179,7 @@ namespace EngineBay.Persistence
                 options =>
                 {
                     options.UseSqlite(connectionString, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                         .WithExpressionExpanding();
 
                     if (sensativeDataLoggingEnabled)
@@ -192,9 +194,9 @@ namespace EngineBay.Persistence
                 options =>
                 {
                     options.UseSqlite(connectionString, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
-                    .WithExpressionExpanding();
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                        .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+                        .WithExpressionExpanding();
 
                     if (sensativeDataLoggingEnabled)
                     {
@@ -208,8 +210,8 @@ namespace EngineBay.Persistence
                 options =>
                 {
                     options.UseSqlite(connectionString, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-                    .WithExpressionExpanding();
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                        .WithExpressionExpanding();
 
                     if (sensativeDataLoggingEnabled)
                     {

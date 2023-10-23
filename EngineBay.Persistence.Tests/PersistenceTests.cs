@@ -1,14 +1,11 @@
 namespace EngineBay.Persistence.Tests
 {
-    using EngineBay.Persistence.Tests.Mocks;
     using Microsoft.EntityFrameworkCore;
     using Xunit;
 
     public class PersistenceTests
     {
         private readonly MockModuleDbContext dbContext;
-
-        private readonly ApplicationUser applicationUser;
 
         private readonly DateTime now = DateTime.UtcNow.AddSeconds(-1);
 
@@ -17,23 +14,16 @@ namespace EngineBay.Persistence.Tests
             Environment.SetEnvironmentVariable(EnvironmentVariableConstants.DATABASEPROVIDER, "InMemory");
 
             var dbContextOptions = new DbContextOptionsBuilder<ModuleWriteDbContext>()
-                    .UseInMemoryDatabase(nameof(PersistenceTests))
-                    .EnableSensitiveDataLogging()
-            .Options;
+                .UseInMemoryDatabase(nameof(PersistenceTests))
+                .EnableSensitiveDataLogging()
+                .Options;
 
-            this.applicationUser = new MockApplicationUser();
-            var currentIdentity = new MockCurrentIdentity(this.applicationUser);
-            var timestampIntercetor = new TimestampInterceptor(currentIdentity);
-
-            var context = new MockModuleDbContext(dbContextOptions, timestampIntercetor);
+            var context = new MockModuleDbContext(dbContextOptions);
             ArgumentNullException.ThrowIfNull(context);
 
             this.dbContext = context;
             this.dbContext.Database.EnsureDeleted();
             this.dbContext.Database.EnsureCreated();
-
-            this.dbContext.ApplicationUsers.Add(this.applicationUser);
-            this.dbContext.SaveChanges();
         }
 
         [Fact]
@@ -69,9 +59,7 @@ namespace EngineBay.Persistence.Tests
 
             await this.dbContext.SaveChangesAsync().ConfigureAwait(false);
 
-            var savedMockEntity = this.dbContext.MockEntities.First();
-
-            Assert.True(savedMockEntity.CreatedAt.Ticks > this.now.Ticks);
+            Assert.True(entity.CreatedAt.Ticks > this.now.Ticks);
         }
 
         [Fact]
@@ -88,47 +76,7 @@ namespace EngineBay.Persistence.Tests
 
             await this.dbContext.SaveChangesAsync().ConfigureAwait(false);
 
-            var savedMockEntity = this.dbContext.MockEntities.First();
-
-            Assert.True(savedMockEntity.LastUpdatedAt.Ticks > this.now.Ticks);
-        }
-
-        [Fact]
-        public async Task SetsTheLastModifiedByUserId()
-        {
-            ArgumentNullException.ThrowIfNull(this.dbContext);
-
-            var entity = new MockEntity()
-            {
-                Name = "Test",
-            };
-
-            this.dbContext.MockEntities.Add(entity);
-
-            await this.dbContext.SaveChangesAsync().ConfigureAwait(false);
-
-            var savedMockEntity = this.dbContext.MockEntities.First();
-
-            Assert.Equal(this.applicationUser.Id, savedMockEntity.LastUpdatedById);
-        }
-
-        [Fact]
-        public async Task SetsTheCreatedByUserId()
-        {
-            ArgumentNullException.ThrowIfNull(this.dbContext);
-
-            var entity = new MockEntity()
-            {
-                Name = "Test",
-            };
-
-            this.dbContext.MockEntities.Add(entity);
-
-            await this.dbContext.SaveChangesAsync().ConfigureAwait(false);
-
-            var savedMockEntity = this.dbContext.MockEntities.First();
-
-            Assert.Equal(this.applicationUser.Id, savedMockEntity.CreatedById);
+            Assert.True(entity.LastUpdatedAt.Ticks > this.now.Ticks);
         }
     }
 }
