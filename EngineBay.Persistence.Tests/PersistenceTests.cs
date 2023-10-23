@@ -38,7 +38,7 @@ namespace EngineBay.Persistence.Tests
 
             this.dbContext.MockEntities.Add(entity);
 
-            await this.dbContext.SaveChangesAsync().ConfigureAwait(false);
+            await this.dbContext.SaveChangesAsync();
 
             var savedMockEntity = this.dbContext.MockEntities.First();
 
@@ -57,7 +57,7 @@ namespace EngineBay.Persistence.Tests
 
             this.dbContext.MockEntities.Add(entity);
 
-            await this.dbContext.SaveChangesAsync().ConfigureAwait(false);
+            await this.dbContext.SaveChangesAsync();
 
             Assert.True(entity.CreatedAt.Ticks > this.now.Ticks);
         }
@@ -74,7 +74,7 @@ namespace EngineBay.Persistence.Tests
 
             this.dbContext.MockEntities.Add(entity);
 
-            await this.dbContext.SaveChangesAsync().ConfigureAwait(false);
+            await this.dbContext.SaveChangesAsync();
 
             Assert.True(entity.LastUpdatedAt.Ticks > this.now.Ticks);
         }
