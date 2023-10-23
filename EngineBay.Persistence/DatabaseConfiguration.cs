@@ -11,7 +11,7 @@ namespace EngineBay.Persistence
     {
         protected override void ConfigureSqlServer(IServiceCollection services, string connectionString)
         {
-            var sensativeDataLoggingEnabled = LoggingConfiguration.IsSensativeDataLoggingEnabled();
+            var sensitiveDataLoggingEnabled = LoggingConfiguration.IsSensitiveDataLoggingEnabled();
 
             services.AddDbContext<TDbContext>(
                 options =>
@@ -20,7 +20,7 @@ namespace EngineBay.Persistence
                         options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                     .WithExpressionExpanding();
 
-                    if (sensativeDataLoggingEnabled)
+                    if (sensitiveDataLoggingEnabled)
                     {
                         options.EnableDetailedErrors();
                         options.EnableSensitiveDataLogging();
@@ -30,7 +30,7 @@ namespace EngineBay.Persistence
 
         protected override void ConfigurePostgres(IServiceCollection services, string connectionString)
         {
-            var sensativeDataLoggingEnabled = LoggingConfiguration.IsSensativeDataLoggingEnabled();
+            var sensitiveDataLoggingEnabled = LoggingConfiguration.IsSensitiveDataLoggingEnabled();
 
             services.AddDbContext<TDbContext>(
                 options =>
@@ -39,7 +39,7 @@ namespace EngineBay.Persistence
                         options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                     .WithExpressionExpanding();
 
-                    if (sensativeDataLoggingEnabled)
+                    if (sensitiveDataLoggingEnabled)
                     {
                         options.EnableDetailedErrors();
                         options.EnableSensitiveDataLogging();
@@ -49,7 +49,7 @@ namespace EngineBay.Persistence
 
         protected override void ConfigureInMemory(IServiceCollection services, string connectionString)
         {
-            var sensativeDataLoggingEnabled = LoggingConfiguration.IsSensativeDataLoggingEnabled();
+            var sensitiveDataLoggingEnabled = LoggingConfiguration.IsSensitiveDataLoggingEnabled();
 
 #pragma warning disable CA2000 // We explicitly want to keep this conneciton open so that it is re-used each time by the dependency injection. When this connection is closed, the in-memory db is wiped.
             var connection = new SqliteConnection(connectionString);
@@ -63,7 +63,7 @@ namespace EngineBay.Persistence
                         options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                         .WithExpressionExpanding();
 
-                    if (sensativeDataLoggingEnabled)
+                    if (sensitiveDataLoggingEnabled)
                     {
                         options.EnableDetailedErrors();
                         options.EnableSensitiveDataLogging();
@@ -73,7 +73,7 @@ namespace EngineBay.Persistence
 
         protected override void ConfigureSqlite(IServiceCollection services, string connectionString)
         {
-            var sensativeDataLoggingEnabled = LoggingConfiguration.IsSensativeDataLoggingEnabled();
+            var sensitiveDataLoggingEnabled = LoggingConfiguration.IsSensitiveDataLoggingEnabled();
 
             services.AddDbContext<TDbContext>(
                 options =>
@@ -82,7 +82,7 @@ namespace EngineBay.Persistence
                         options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                         .WithExpressionExpanding();
 
-                    if (sensativeDataLoggingEnabled)
+                    if (sensitiveDataLoggingEnabled)
                     {
                         options.EnableDetailedErrors();
                         options.EnableSensitiveDataLogging();

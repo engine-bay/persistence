@@ -24,7 +24,7 @@ namespace EngineBay.Persistence
         /// <inheritdoc/>
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            return await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            return await base.SaveChangesAsync(cancellationToken);
         }
 
         public Task<int> SaveChangesAsync(ApplicationUser user, CancellationToken cancellationToken = default)
