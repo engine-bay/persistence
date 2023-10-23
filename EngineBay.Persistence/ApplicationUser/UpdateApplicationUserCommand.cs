@@ -6,7 +6,7 @@
 
         public ApplicationUser ToDomainModel()
         {
-            return new ApplicationUser { Username = this.Username };
+            return new ApplicationUser(this.Username);
         }
     }
 }

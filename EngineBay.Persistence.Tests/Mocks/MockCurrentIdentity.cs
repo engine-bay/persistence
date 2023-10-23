@@ -13,7 +13,7 @@
             this.Username = user.Username;
         }
 
-        public string? Username { get; }
+        public string Username { get; }
 
         public Guid UserId { get; }
     }
