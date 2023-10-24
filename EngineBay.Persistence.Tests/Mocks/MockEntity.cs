@@ -18,9 +18,9 @@ namespace EngineBay.Persistence.Tests
 
             modelBuilder.Entity<MockEntity>().HasKey(x => x.Id);
 
-            modelBuilder.Entity<MockEntity>().Property(x => x.CreatedAt);
+            modelBuilder.Entity<MockEntity>().Property(x => x.CreatedAt).IsRequired();
 
-            modelBuilder.Entity<MockEntity>().Property(x => x.LastUpdatedAt);
+            modelBuilder.Entity<MockEntity>().Property(x => x.LastUpdatedAt).IsRequired();
 
             modelBuilder.Entity<MockEntity>().Property(x => x.CreatedById);
 
