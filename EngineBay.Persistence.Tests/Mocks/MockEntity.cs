@@ -22,11 +22,11 @@ namespace EngineBay.Persistence.Tests
 
             modelBuilder.Entity<MockEntity>().Property(x => x.LastUpdatedAt).IsRequired();
 
-            modelBuilder.Entity<MockEntity>().Property(x => x.CreatedById).IsRequired();
+            modelBuilder.Entity<MockEntity>().Property(x => x.CreatedById);
 
             modelBuilder.Entity<MockEntity>().HasOne(x => x.CreatedBy);
 
-            modelBuilder.Entity<MockEntity>().Property(x => x.LastUpdatedById).IsRequired();
+            modelBuilder.Entity<MockEntity>().Property(x => x.LastUpdatedById);
 
             modelBuilder.Entity<MockEntity>().HasOne(x => x.LastUpdatedBy);
 

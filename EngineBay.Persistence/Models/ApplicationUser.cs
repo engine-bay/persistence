@@ -5,14 +5,16 @@ namespace EngineBay.Persistence
 
     public class ApplicationUser : AuditableModel
     {
-        public string? Username { get; set; }
+        public ApplicationUser(string username)
+        {
+            this.Username = username;
+        }
+
+        public string Username { get; set; }
 
         public static new void CreateDataAnnotations(ModelBuilder modelBuilder)
         {
-            if (modelBuilder is null)
-            {
-                throw new ArgumentNullException(nameof(modelBuilder));
-            }
+            ArgumentNullException.ThrowIfNull(modelBuilder);
 
             modelBuilder.Entity<ApplicationUser>().ToTable(typeof(ApplicationUser).Name.Pluralize());
 

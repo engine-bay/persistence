@@ -14,14 +14,15 @@ namespace EngineBay.Persistence
         protected override void ConfigureSqlServer(IServiceCollection services, string connectionString)
         {
             var sensitiveDataLoggingEnabled = LoggingConfiguration.IsSensitiveDataLoggingEnabled();
+            var timestampInterceptor = new TimestampInterceptor();
 
             // Register a general purpose db context that is not pooled
             services.AddDbContext<TDbContext>(
                 options =>
                 {
                     options.UseSqlServer(connectionString, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
-                    .WithExpressionExpanding();
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
+                        .WithExpressionExpanding();
 
                     if (sensitiveDataLoggingEnabled)
                     {
@@ -35,9 +36,9 @@ namespace EngineBay.Persistence
                 options =>
                 {
                     options.UseSqlServer(connectionString, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
-                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
-                    .WithExpressionExpanding();
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
+                        .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+                        .WithExpressionExpanding();
 
                     if (sensitiveDataLoggingEnabled)
                     {
@@ -51,8 +52,9 @@ namespace EngineBay.Persistence
                 options =>
                 {
                     options.UseSqlServer(connectionString, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
-                    .WithExpressionExpanding();
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
+                        .WithExpressionExpanding()
+                        .AddInterceptors(timestampInterceptor);
 
                     if (sensitiveDataLoggingEnabled)
                     {
@@ -65,13 +67,14 @@ namespace EngineBay.Persistence
         protected override void ConfigurePostgres(IServiceCollection services, string connectionString)
         {
             var sensitiveDataLoggingEnabled = LoggingConfiguration.IsSensitiveDataLoggingEnabled();
+            var timestampInterceptor = new TimestampInterceptor();
 
             // Register a general purpose db context that is not pooled
             services.AddDbContext<TDbContext>(
                 options =>
                 {
                     options.UseNpgsql(connectionString, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
                         .WithExpressionExpanding();
 
                     if (sensitiveDataLoggingEnabled)
@@ -86,9 +89,9 @@ namespace EngineBay.Persistence
                 options =>
                 {
                     options.UseNpgsql(connectionString, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
-                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
-                    .WithExpressionExpanding();
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
+                        .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+                        .WithExpressionExpanding();
 
                     if (sensitiveDataLoggingEnabled)
                     {
@@ -102,8 +105,9 @@ namespace EngineBay.Persistence
                 options =>
                 {
                     options.UseNpgsql(connectionString, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
-                    .WithExpressionExpanding();
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
+                        .WithExpressionExpanding()
+                        .AddInterceptors(timestampInterceptor);
 
                     if (sensitiveDataLoggingEnabled)
                     {
@@ -116,6 +120,7 @@ namespace EngineBay.Persistence
         protected override void ConfigureInMemory(IServiceCollection services, string connectionString)
         {
             var sensitiveDataLoggingEnabled = LoggingConfiguration.IsSensitiveDataLoggingEnabled();
+            var timestampInterceptor = new TimestampInterceptor();
 #pragma warning disable CA2000 // We explicitly want to keep this conneciton open so that it is re-used each time by the dependency injection. When this connection is closed, the in-memory db is wiped.
             var connection = new SqliteConnection(connectionString);
 #pragma warning restore CA2000
@@ -126,7 +131,7 @@ namespace EngineBay.Persistence
                 options =>
                 {
                     options.UseSqlite(connection, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                         .WithExpressionExpanding();
 
                     if (sensitiveDataLoggingEnabled)
@@ -141,9 +146,9 @@ namespace EngineBay.Persistence
                 options =>
                 {
                     options.UseSqlite(connection, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
-                    .WithExpressionExpanding();
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                        .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+                        .WithExpressionExpanding();
 
                     if (sensitiveDataLoggingEnabled)
                     {
@@ -157,8 +162,9 @@ namespace EngineBay.Persistence
                 options =>
                 {
                     options.UseSqlite(connection, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-                    .WithExpressionExpanding();
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                        .WithExpressionExpanding()
+                        .AddInterceptors(timestampInterceptor);
 
                     if (sensitiveDataLoggingEnabled)
                     {
@@ -171,13 +177,14 @@ namespace EngineBay.Persistence
         protected override void ConfigureSqlite(IServiceCollection services, string connectionString)
         {
             var sensitiveDataLoggingEnabled = LoggingConfiguration.IsSensitiveDataLoggingEnabled();
+            var timestampInterceptor = new TimestampInterceptor();
 
             // Register a general purpose db context
             services.AddDbContext<TDbContext>(
                 options =>
                 {
                     options.UseSqlite(connectionString, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                         .WithExpressionExpanding();
 
                     if (sensitiveDataLoggingEnabled)
@@ -192,9 +199,9 @@ namespace EngineBay.Persistence
                 options =>
                 {
                     options.UseSqlite(connectionString, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
-                    .WithExpressionExpanding();
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                        .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+                        .WithExpressionExpanding();
 
                     if (sensitiveDataLoggingEnabled)
                     {
@@ -208,8 +215,9 @@ namespace EngineBay.Persistence
                 options =>
                 {
                     options.UseSqlite(connectionString, options =>
-                        options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-                    .WithExpressionExpanding();
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                        .WithExpressionExpanding()
+                        .AddInterceptors(timestampInterceptor);
 
                     if (sensitiveDataLoggingEnabled)
                     {
