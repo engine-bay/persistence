@@ -67,6 +67,7 @@ namespace EngineBay.Persistence
         protected override void ConfigurePostgres(IServiceCollection services, string connectionString)
         {
             var sensitiveDataLoggingEnabled = LoggingConfiguration.IsSensitiveDataLoggingEnabled();
+            var timestampInterceptor = new TimestampInterceptor();
 
             // Register a general purpose db context that is not pooled
             services.AddDbContext<TDbContext>(
@@ -105,7 +106,8 @@ namespace EngineBay.Persistence
                 {
                     options.UseNpgsql(connectionString, options =>
                             options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
-                        .WithExpressionExpanding();
+                        .WithExpressionExpanding()
+                        .AddInterceptors(timestampInterceptor);
 
                     if (sensitiveDataLoggingEnabled)
                     {
@@ -118,6 +120,7 @@ namespace EngineBay.Persistence
         protected override void ConfigureInMemory(IServiceCollection services, string connectionString)
         {
             var sensitiveDataLoggingEnabled = LoggingConfiguration.IsSensitiveDataLoggingEnabled();
+            var timestampInterceptor = new TimestampInterceptor();
 #pragma warning disable CA2000 // We explicitly want to keep this conneciton open so that it is re-used each time by the dependency injection. When this connection is closed, the in-memory db is wiped.
             var connection = new SqliteConnection(connectionString);
 #pragma warning restore CA2000
@@ -160,7 +163,8 @@ namespace EngineBay.Persistence
                 {
                     options.UseSqlite(connection, options =>
                             options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-                        .WithExpressionExpanding();
+                        .WithExpressionExpanding()
+                        .AddInterceptors(timestampInterceptor);
 
                     if (sensitiveDataLoggingEnabled)
                     {
@@ -173,6 +177,7 @@ namespace EngineBay.Persistence
         protected override void ConfigureSqlite(IServiceCollection services, string connectionString)
         {
             var sensitiveDataLoggingEnabled = LoggingConfiguration.IsSensitiveDataLoggingEnabled();
+            var timestampInterceptor = new TimestampInterceptor();
 
             // Register a general purpose db context
             services.AddDbContext<TDbContext>(
@@ -211,7 +216,8 @@ namespace EngineBay.Persistence
                 {
                     options.UseSqlite(connectionString, options =>
                             options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-                        .WithExpressionExpanding();
+                        .WithExpressionExpanding()
+                        .AddInterceptors(timestampInterceptor);
 
                     if (sensitiveDataLoggingEnabled)
                     {
