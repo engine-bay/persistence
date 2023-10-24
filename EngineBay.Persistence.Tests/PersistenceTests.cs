@@ -22,8 +22,6 @@ namespace EngineBay.Persistence.Tests
             ArgumentNullException.ThrowIfNull(context);
 
             this.dbContext = context;
-            this.dbContext.Database.EnsureDeleted();
-            this.dbContext.Database.EnsureCreated();
         }
 
         [Fact]
