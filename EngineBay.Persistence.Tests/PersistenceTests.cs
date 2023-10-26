@@ -19,7 +19,6 @@ namespace EngineBay.Persistence.Tests
                 .Options;
 
             var context = new MockModuleDbContext(dbContextOptions);
-            ArgumentNullException.ThrowIfNull(context);
 
             this.dbContext = context;
         }
@@ -27,8 +26,6 @@ namespace EngineBay.Persistence.Tests
         [Fact]
         public async Task CanSaveChanges()
         {
-            ArgumentNullException.ThrowIfNull(this.dbContext);
-
             var entity = new MockEntity()
             {
                 Name = "Test",
@@ -46,8 +43,6 @@ namespace EngineBay.Persistence.Tests
         [Fact]
         public async Task SetsTheCreatedDate()
         {
-            ArgumentNullException.ThrowIfNull(this.dbContext);
-
             var entity = new MockEntity()
             {
                 Name = "Test",
@@ -63,8 +58,6 @@ namespace EngineBay.Persistence.Tests
         [Fact]
         public async Task SetsTheLastModifiedDate()
         {
-            ArgumentNullException.ThrowIfNull(this.dbContext);
-
             var entity = new MockEntity()
             {
                 Name = "Test",

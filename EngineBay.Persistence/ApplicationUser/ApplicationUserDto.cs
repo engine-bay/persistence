@@ -4,7 +4,10 @@
     {
         public ApplicationUserDto(ApplicationUser applicationUser)
         {
-            ArgumentNullException.ThrowIfNull(applicationUser);
+            if (applicationUser is null)
+            {
+                throw new ArgumentNullException(nameof(applicationUser));
+            }
 
             this.Id = applicationUser.Id;
             this.Username = applicationUser.Username;

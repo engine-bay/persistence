@@ -1,6 +1,5 @@
 ﻿namespace EngineBay.Persistence
 {
-    using System.Security.Claims;
     using EngineBay.Core;
 
     public class UpdateApplicationUser : ICommandHandler<UpdateApplicationUserCommand, ApplicationUserDto>
@@ -12,14 +11,17 @@
             this.writeDbContext = writeDbContext;
         }
 
-        public async Task<ApplicationUserDto> Handle(UpdateApplicationUserCommand inputParameters, ClaimsPrincipal user, CancellationToken cancellation)
+        public async Task<ApplicationUserDto> Handle(UpdateApplicationUserCommand inputParameters, CancellationToken cancellation)
         {
-            ArgumentNullException.ThrowIfNull(inputParameters, nameof(inputParameters));
+            if (inputParameters is null)
+            {
+                throw new ArgumentNullException(nameof(inputParameters));
+            }
 
             var userModel = inputParameters.ToDomainModel();
 
-            await this.writeDbContext.AddAsync(userModel, cancellation).ConfigureAwait(false);
-            await this.writeDbContext.SaveChangesAsync(cancellation).ConfigureAwait(false);
+            await this.writeDbContext.AddAsync(userModel, cancellation);
+            await this.writeDbContext.SaveChangesAsync(cancellation);
 
             return new ApplicationUserDto(userModel);
         }
