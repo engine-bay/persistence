@@ -14,7 +14,10 @@ namespace EngineBay.Persistence
 
         public static new void CreateDataAnnotations(ModelBuilder modelBuilder)
         {
-            ArgumentNullException.ThrowIfNull(modelBuilder);
+            if (modelBuilder is null)
+            {
+                throw new ArgumentNullException(nameof(modelBuilder));
+            }
 
             modelBuilder.Entity<ApplicationUser>().ToTable(typeof(ApplicationUser).Name.Pluralize());
 

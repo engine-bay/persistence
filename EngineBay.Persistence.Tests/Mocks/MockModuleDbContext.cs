@@ -1,6 +1,5 @@
 namespace EngineBay.Persistence.Tests
 {
-    using EngineBay.Core;
     using Microsoft.EntityFrameworkCore;
 
     public class MockModuleDbContext : ModuleWriteDbContext, IModuleWriteDbContext
@@ -21,7 +20,10 @@ namespace EngineBay.Persistence.Tests
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            ArgumentNullException.ThrowIfNull(optionsBuilder);
+            if (optionsBuilder is null)
+            {
+                throw new ArgumentNullException(nameof(optionsBuilder));
+            }
 
             optionsBuilder.AddInterceptors(new TimestampInterceptor());
 
