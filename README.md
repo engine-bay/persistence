@@ -25,12 +25,12 @@ To use this module in your own, you will need to create three DbContexts - gener
 
 ```mermaid
 %%{init: {"flowchart": {"htmlLabels": false}} }%%
-flowchart TB
-    ModuleDbContext --> ModuleQueryDbContext
-    ModuleQueryDbContext --> ModuleWriteDbContext
-    ModuleWriteDbContext --> BlueprintsDbContext
-    BlueprintsDbContext --> BlueprintsQueryDbContext
-    BlueprintsQueryDbContext --> BlueprintsWriteDbContext
+flowchart BT
+    BlueprintsWriteDbContext --> BlueprintsQueryDbContext
+    BlueprintsQueryDbContext --> BlueprintsDbContext
+    BlueprintsDbContext --> ModuleWriteDbContext
+    ModuleWriteDbContext --> ModuleQueryDbContext
+    ModuleQueryDbContext --> ModuleDbContext
     click ModuleDbContext "https://github.com/engine-bay/persistence/blob/feature/readmes/EngineBay.Persistence/DbContexts/ModuleDbContext.cs" _blank
     click ModuleQueryDbContext "https://github.com/engine-bay/persistence/blob/feature/readmes/EngineBay.Persistence/DbContexts/ModuleQueryDbContext.cs" _blank
     click ModuleWriteDbContext "https://github.com/engine-bay/persistence/blob/feature/readmes/EngineBay.Persistence/DbContexts/ModuleWriteDbContext.cs" _blank
