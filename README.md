@@ -31,12 +31,12 @@ flowchart TB
     ModuleWriteDbContext --> BlueprintsDbContext
     BlueprintsDbContext --> BlueprintsQueryDbContext
     BlueprintsQueryDbContext --> BlueprintsWriteDbContext
-    click ModuleDbContext href "EngineBay.Persistence/DbContexts/ModuleDbContext.cs" _blank
-    click ModuleQueryDbContext href "EngineBay.Persistence/DbContexts/ModuleQueryDbContext.cs" _blank
-    click ModuleWriteDbContext href "EngineBay.Persistence/DbContexts/ModuleQueryDbContext.cs" _blank
-    click BlueprintsDbContext href "https://github.com/engine-bay/blueprints/blob/main/EngineBay.Blueprints/Persistence/BlueprintsDbContext.cs" _blank
-    click BlueprintsQueryDbContext href "https://github.com/engine-bay/blueprints/blob/main/EngineBay.Blueprints/Persistence/BlueprintsQueryDbContext.cs" _blank
-    click BlueprintsWriteDbContext href "https://github.com/engine-bay/blueprints/blob/main/EngineBay.Blueprints/Persistence/BlueprintsWriteDbContext.cs" _blank
+    click ModuleDbContext "https://github.com/engine-bay/persistence/blob/feature/readmes/EngineBay.Persistence/DbContexts/ModuleDbContext.cs" _blank
+    click ModuleQueryDbContext "https://github.com/engine-bay/persistence/blob/feature/readmes/EngineBay.Persistence/DbContexts/ModuleQueryDbContext.cs" _blank
+    click ModuleWriteDbContext "https://github.com/engine-bay/persistence/blob/feature/readmes/EngineBay.Persistence/DbContexts/ModuleWriteDbContext.cs" _blank
+    click BlueprintsDbContext "https://github.com/engine-bay/blueprints/blob/main/EngineBay.Blueprints/Persistence/BlueprintsDbContext.cs" _blank
+    click BlueprintsQueryDbContext "https://github.com/engine-bay/blueprints/blob/main/EngineBay.Blueprints/Persistence/BlueprintsQueryDbContext.cs" _blank
+    click BlueprintsWriteDbContext "https://github.com/engine-bay/blueprints/blob/main/EngineBay.Blueprints/Persistence/BlueprintsWriteDbContext.cs" _blank
 ```
 
 You should register your DbSets only in your generic DbContext:
