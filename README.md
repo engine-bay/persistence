@@ -156,7 +156,7 @@ You will then be able to use your DbContexts freely, as you might any other DbCo
 
 ### Registration
 
-This module cannot run on its own. You will need to register it and its DbContext in your application to use its functionality. See [EngineBay.CommunityEdition](https://github.com/engine-bay/engine-bay-ce)'s example of [module registration](https://github.com/engine-bay/engine-bay-ce/blob/main/EngineBay.CommunityEdition/Modules/ModuleRegistration.cs) for an example of how to do this.
+This module cannot run on its own. You will need to register it in your application to use its functionality. See [EngineBay.CommunityEdition](https://github.com/engine-bay/engine-bay-ce)'s example of [module registration](https://github.com/engine-bay/engine-bay-ce/blob/main/EngineBay.CommunityEdition/Modules/ModuleRegistration.cs) for an example of how to do this.
 
 ```cs
         private static IEnumerable<IModule> GetRegisteredModules()
