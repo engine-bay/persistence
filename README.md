@@ -11,7 +11,7 @@ Persistence module for EngineBay published to [EngineBay.Persistence](https://ww
 
 The persistence module provides structures to configure and register any database connections that modules in your application might need.
 
-The DbContexts from this module should be inherited by the DbContexts of any module that needs to use a database. To support [Command and Query Responsibility Segregation (CQRS)](https://learn.microsoft.com/en-us/azure/architecture/patterns/cqrs), a read-optimised and a write-optimised DbContext are provided - though a general-purpose one is also provided. 
+The DbContexts from this module should be inherited by the DbContexts of any module that needs to use a database. To support [Command and Query Responsibility Segregation (CQRS)](https://learn.microsoft.com/en-us/azure/architecture/patterns/cqrs), a [read-optimised](EngineBay.Persistence/DbContexts/ModuleQueryDbContext.cs) and a [write-optimised](EngineBay.Persistence/DbContexts/ModuleWriteDbContext.cs) DbContext are provided - though a [general-purpose](EngineBay.Persistence/DbContexts/ModuleDbContext.cs) one is also provided. 
 
 The [TimestampInterceptor](EngineBay.Persistence/Interceptors/TimestampInterceptor.cs) will add creation and modification timestamps to any model that implements [EngineBay.Core's](https://github.com/engine-bay/core) [BaseModel](https://github.com/engine-bay/core/blob/main/EngineBay.Core/Models/BaseModel.cs).
 
@@ -21,9 +21,25 @@ The [AuditableModel](EngineBay.Persistence/Models/AuditableModel.cs) abstract cl
 
 ## Usage
 
-To use this module in your own, you will need to create three DbContexts - generic, read, and write - so that they can be registered.
+To use this module in your own, you will need to create three DbContexts - generic, read, and write - so that they can be registered. With the currently preferred structure, they will need to inherit from the Persistence DbContexts in a chain like shown in this diagram (using [EngineBay.Blueprints](https://github.com/engine-bay/blueprints) module as an example):
 
-With the currently preferred inheritance structure, your generic context should inherit from [ModuleWriteDbContext](EngineBay.Persistence/DbContexts/ModuleWriteDbContext.cs). Declare all of your DbSets in this context. For example:
+```mermaid
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+flowchart TB
+    ModuleDbContext --> ModuleQueryDbContext
+    ModuleQueryDbContext --> ModuleWriteDbContext
+    ModuleWriteDbContext --> BlueprintsDbContext
+    BlueprintsDbContext --> BlueprintsQueryDbContext
+    BlueprintsQueryDbContext --> BlueprintsWriteDbContext
+    click ModuleDbContext href "EngineBay.Persistence/DbContexts/ModuleDbContext.cs" _blank
+    click ModuleQueryDbContext href "EngineBay.Persistence/DbContexts/ModuleQueryDbContext.cs" _blank
+    click ModuleWriteDbContext href "EngineBay.Persistence/DbContexts/ModuleQueryDbContext.cs" _blank
+    click BlueprintsDbContext href "https://github.com/engine-bay/blueprints/blob/main/EngineBay.Blueprints/Persistence/BlueprintsDbContext.cs" _blank
+    click BlueprintsQueryDbContext href "https://github.com/engine-bay/blueprints/blob/main/EngineBay.Blueprints/Persistence/BlueprintsQueryDbContext.cs" _blank
+    click BlueprintsWriteDbContext href "https://github.com/engine-bay/blueprints/blob/main/EngineBay.Blueprints/Persistence/BlueprintsWriteDbContext.cs" _blank
+```
+
+You should register your DbSets only in your generic DbContext:
 
 ```cs
 namespace EngineBay.Blueprints
@@ -51,42 +67,6 @@ namespace EngineBay.Blueprints
             // More annotations...
 
             base.OnModelCreating(modelBuilder);
-        }
-    }
-}
-```
-
-Your read context can inherit from this:
-
-```cs
-namespace EngineBay.Blueprints
-{
-    using EngineBay.Persistence;
-    using Microsoft.EntityFrameworkCore;
-
-    public class BlueprintsQueryDbContext : BlueprintsDbContext
-    {
-        public BlueprintsQueryDbContext(DbContextOptions<ModuleWriteDbContext> options)
-            : base(options)
-        {
-        }
-    }
-}
-```
-
-And, in turn, your write context from the read context:
-
-```cs
-namespace EngineBay.Blueprints
-{
-    using EngineBay.Persistence;
-    using Microsoft.EntityFrameworkCore;
-
-    public class BlueprintsWriteDbContext : BlueprintsQueryDbContext
-    {
-        public BlueprintsWriteDbContext(DbContextOptions<ModuleWriteDbContext> options)
-            : base(options)
-        {
         }
     }
 }
@@ -177,15 +157,15 @@ Note that you do not need to register the Persistence DbContexts. The Applicatio
 
 The following environment variables control the database configuration and behavior of EngineBay.
 
-| Environment variable             | Default value |                    Options                    | Description                                                                                                                                                                                                                                                            |
-|:---------------------------------|:-------------:|:---------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `DATABASE_PROVIDER`              |   `SQLite`    | `InMemory`, `SQLite`, `SqlServer`, `Postgres` | The relational database provider to use. Defaults to SQLite when not set.                                                                                                                                                                                              |
-| `DATABASE_CONNECTION_STRING`     |    `none`     |                      N/A                      | The connection string to use for the configured `DATABASE_PROVIDER`                                                                                                                                                                                                    |
-| `DATABASE_RESET`                 |    `false`    |            `true`, `false`, `none`            | This will ***RESET*** the database, deleting all tables and re-applying database migrations. This is intended for development and testing activities where a deterministic database state is required. Is always `true` when ``DATABASE_PROVIDER` is set to `InMemory` |
-| `DATABASE_RESEED`                |    `false`    |            `true`, `false`, `none`            | This will ***RESEED*** the database with initial data. This is intended for development and testing activities where a deterministic database state is required.                                                                                                       |
-| `DATABASE_SEED_DATA_PATH`        | `/seed-data`  |               `string`, `none`                | The directory to be used to look for seed data files.                                                                                                                                                                                                                  |
-| `DATABASE_EXIT_AFTER_MIGRATIONS` |    `false`    |            `true`, `false`, `none`            | Force shutdown after migrations are completed. This is intended for use in simulating database migrations in CI environments.                                                                                                                                          |
-| `DATABASE_EXIT_AFTER_SEEDING`    |    `false`    |            `true`, `false`, `none`            | Force shutdown after database (re)seeding is are completed. This is intended for use in simulating database migrations in CI environments. Only applies if `DATABASE_RESEED` is `true`                                                                                 |
+| Environment variable             | Default value |                    Options                    | Description                                                                                                                                                                                                                                                           |
+|:---------------------------------|:-------------:|:---------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `DATABASE_PROVIDER`              |   `SQLite`    | `InMemory`, `SQLite`, `SqlServer`, `Postgres` | The relational database provider to use. Defaults to SQLite when not set.                                                                                                                                                                                             |
+| `DATABASE_CONNECTION_STRING`     |    `none`     |                      N/A                      | The connection string to use for the configured `DATABASE_PROVIDER`                                                                                                                                                                                                   |
+| `DATABASE_RESET`                 |    `false`    |            `true`, `false`, `none`            | This will ***RESET*** the database, deleting all tables and re-applying database migrations. This is intended for development and testing activities where a deterministic database state is required. Is always `true` when `DATABASE_PROVIDER` is set to `InMemory` |
+| `DATABASE_RESEED`                |    `false`    |            `true`, `false`, `none`            | This will ***RESEED*** the database with initial data. This is intended for development and testing activities where a deterministic database state is required.                                                                                                      |
+| `DATABASE_SEED_DATA_PATH`        | `/seed-data`  |               `string`, `none`                | The directory to be used to look for seed data files.                                                                                                                                                                                                                 |
+| `DATABASE_EXIT_AFTER_MIGRATIONS` |    `false`    |            `true`, `false`, `none`            | Force shutdown after migrations are completed. This is intended for use in simulating database migrations in CI environments.                                                                                                                                         |
+| `DATABASE_EXIT_AFTER_SEEDING`    |    `false`    |            `true`, `false`, `none`            | Force shutdown after database (re)seeding is are completed. This is intended for use in simulating database migrations in CI environments. Only applies if `DATABASE_RESEED` is `true`                                                                                |
 
 ## Dependencies
 
