@@ -9,17 +9,21 @@ Persistence module for EngineBay published to [EngineBay.Persistence](https://ww
 
 ## About
 
-The persistence module provides structures to configure any database connections that modules in your application might need.
+The persistence module provides structures to configure and register any database connections that modules in your application might need.
 
 The DbContexts from this module should be inherited by the DbContexts of any module that needs to use a database. To support [Command and Query Responsibility Segregation (CQRS)](https://learn.microsoft.com/en-us/azure/architecture/patterns/cqrs), a read-optimised and a write-optimised DbContext are provided - though a general-purpose one is also provided. 
 
 The [TimestampInterceptor](EngineBay.Persistence/Interceptors/TimestampInterceptor.cs) will add creation and modification timestamps to any model that implements [EngineBay.Core's](https://github.com/engine-bay/core) [BaseModel](https://github.com/engine-bay/core/blob/main/EngineBay.Core/Models/BaseModel.cs).
 
+The [AuditableModel](EngineBay.Persistence/Models/AuditableModel.cs) abstract class will provide some standard fields for tracking which users make changes to any inheriting models. If changes are saved on a DbContext that uses [EngineBay.Auditing's]([EngineBay.Auditing](https://github.com/engine-bay/auditing)) [AuditInterceptor](https://github.com/engine-bay/auditing/blob/main/EngineBay.Auditing/Interceptors/AuditingInterceptor.cs), then audit entries will automatically be created for any models that implement AuditableModel.
+
+[ApplicationUser](https://github.com/engine-bay/persistence/blob/efefc4fef4a0b7478abf288237ba1d563d88cb5e/EngineBay.Persistence/Models/ApplicationUser.cs) is a simple representation of a user for the application. It has a DbSet provided in [ModuleDbContext](EngineBay.Persistence/DbContexts/ModuleDbContext.cs) so that any module inheriting these contexts will have access to the application users. ApplicationUser implements AuditableModel. 
+
 ## Usage
 
-To use this module in another, you will need to create three DbContexts - generic, read, and write - so that they can be registered.
+To use this module in your own, you will need to create three DbContexts - generic, read, and write - so that they can be registered.
 
-With the currently preferred inheritance structure, your generic context should inherit from [ModuleWriteDbContext](EngineBay.Persistence/DbContexts/ModuleWriteDbContext.cs). Declare all your DbSets in this context. For example:
+With the currently preferred inheritance structure, your generic context should inherit from [ModuleWriteDbContext](EngineBay.Persistence/DbContexts/ModuleWriteDbContext.cs). Declare all of your DbSets in this context. For example:
 
 ```cs
 namespace EngineBay.Blueprints
@@ -122,7 +126,7 @@ namespace EngineBay.Blueprints
 }
 ```
 
-When you've created your module's DbContexts, you will need add them to your module's registration class, such as this:
+When you've created your module's DbContexts, you will need to create a [CQRSDatabaseConfiguration](EngineBay.Persistence/CQRSDatabaseConfiguration.cs) object in your module's setup class that will register the contexts. For example:
 
 ```cs
 namespace EngineBay.Blueprints
