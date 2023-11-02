@@ -36,7 +36,6 @@
         </When>
         <Otherwise>
             <ItemGroup>
-                <PackageReference Include="FluentValidation" Version="11.7.1" />
                 <PackageReference Include="EngineBay.Core" Version="7.0.0" />
                 <PackageReference Include="EngineBay.Logging" Version="2.0.3" />
             </ItemGroup>

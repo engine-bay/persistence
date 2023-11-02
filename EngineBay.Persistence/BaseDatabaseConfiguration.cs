@@ -110,29 +110,6 @@ namespace EngineBay.Persistence
             return false;
         }
 
-        public static bool IsAuditingEnabled()
-        {
-            var auditingEnabledEnvironmentVariable = Environment.GetEnvironmentVariable(EnvironmentVariableConstants.DATABASEAUDITINGENABLED);
-
-            if (string.IsNullOrEmpty(auditingEnabledEnvironmentVariable))
-            {
-                return true;
-            }
-
-            bool auditingEnabled;
-            if (bool.TryParse(auditingEnabledEnvironmentVariable, out auditingEnabled))
-            {
-                if (!auditingEnabled)
-                {
-                    Console.WriteLine($"Warning: Auditing has been disabled by {EnvironmentVariableConstants.DATABASEAUDITINGENABLED} configuration.");
-                }
-
-                return auditingEnabled;
-            }
-
-            throw new ArgumentException($"Invalid {EnvironmentVariableConstants.DATABASEAUDITINGENABLED} configuration.");
-        }
-
         public static string GetDatabaseConnectionString()
         {
             var databaseProvider = GetDatabaseProvider();
