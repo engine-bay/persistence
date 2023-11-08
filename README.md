@@ -136,38 +136,15 @@ You will then be able to use your DbContexts freely, as you might any other DbCo
 
 ### Registration
 
-This module cannot run on its own. You will need to register it in your application to use its functionality. See [EngineBay.CommunityEdition](https://github.com/engine-bay/engine-bay-ce)'s example of [module registration](https://github.com/engine-bay/engine-bay-ce/blob/main/EngineBay.CommunityEdition/Modules/ModuleRegistration.cs) for an example of how to do this.
-
-```cs
-        private static IEnumerable<IModule> GetRegisteredModules()
-        {
-            var modules = new List<IModule>();
-
-            modules.Add(new PersistenceModule());
-           // Other modules...
-
-            Console.WriteLine($"Discovered {modules.Count} EngineBay modules");
-            return modules;
-        }
-```
+This module cannot run on its own. You will need to register it in your application to use its functionality. See the [Demo API registration guide](https://github.com/engine-bay/demo-api).
 
 Note that you do not need to register the Persistence DbContexts. The ApplicationUsers DbSet that these contexts provide will be available to any other module's DbContexts by virtue of inheritance.
 
 ### Environment Variables
 
-The following environment variables control the database configuration and behavior of EngineBay.
-
-| Environment variable             | Default value |                    Options                    | Description                                                                                                                                                                                                                                                           |
-|:---------------------------------|:-------------:|:---------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `DATABASE_PROVIDER`              |   `SQLite`    | `InMemory`, `SQLite`, `SqlServer`, `Postgres` | The relational database provider to use. Defaults to SQLite when not set.                                                                                                                                                                                             |
-| `DATABASE_CONNECTION_STRING`     |    `none`     |                      N/A                      | The connection string to use for the configured `DATABASE_PROVIDER`                                                                                                                                                                                                   |
-| `DATABASE_RESET`                 |    `false`    |            `true`, `false`, `none`            | This will ***RESET*** the database, deleting all tables and re-applying database migrations. This is intended for development and testing activities where a deterministic database state is required. Is always `true` when `DATABASE_PROVIDER` is set to `InMemory` |
-| `DATABASE_RESEED`                |    `false`    |            `true`, `false`, `none`            | This will ***RESEED*** the database with initial data. This is intended for development and testing activities where a deterministic database state is required.                                                                                                      |
-| `DATABASE_SEED_DATA_PATH`        | `/seed-data`  |               `string`, `none`                | The directory to be used to look for seed data files.                                                                                                                                                                                                                 |
-| `DATABASE_EXIT_AFTER_MIGRATIONS` |    `false`    |            `true`, `false`, `none`            | Force shutdown after migrations are completed. This is intended for use in simulating database migrations in CI environments.                                                                                                                                         |
-| `DATABASE_EXIT_AFTER_SEEDING`    |    `false`    |            `true`, `false`, `none`            | Force shutdown after database (re)seeding is are completed. This is intended for use in simulating database migrations in CI environments. Only applies if `DATABASE_RESEED` is `true`                                                                                |
+See the [Documentation Portal](https://github.com/engine-bay/documentation-portal/blob/main/EngineBay.DocumentationPortal/DocumentationPortal/docs/documentation/configuration/environment-variables.md#data-protection).
 
 ## Dependencies
 
-* [EngineBay.Core](https://github.com/engine-bay/core): Provides several shared classes and base interfaces.
-* [EngineBay.Logging](https://github.com/engine-bay/logging): Provides configuration for sensitive data logging
+* [EngineBay.Core](https://github.com/engine-bay/core)
+* [EngineBay.Logging](https://github.com/engine-bay/logging)
