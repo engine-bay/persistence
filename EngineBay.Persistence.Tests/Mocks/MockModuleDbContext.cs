@@ -20,10 +20,7 @@ namespace EngineBay.Persistence.Tests
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (optionsBuilder is null)
-            {
-                throw new ArgumentNullException(nameof(optionsBuilder));
-            }
+            ArgumentNullException.ThrowIfNull(optionsBuilder);
 
             optionsBuilder.AddInterceptors(new TimestampInterceptor());
 

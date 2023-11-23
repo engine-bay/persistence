@@ -13,10 +13,7 @@
 
         public async Task<ApplicationUserDto> Handle(UpdateApplicationUserCommand inputParameters, CancellationToken cancellation)
         {
-            if (inputParameters is null)
-            {
-                throw new ArgumentNullException(nameof(inputParameters));
-            }
+            ArgumentNullException.ThrowIfNull(inputParameters);
 
             var userModel = inputParameters.ToDomainModel();
 
