@@ -37,7 +37,7 @@
         <Otherwise>
             <ItemGroup>
                 <PackageReference Include="EngineBay.Core" Version="8.0.1" />
-                <PackageReference Include="EngineBay.Logging" Version="3.0.0" />
+                <PackageReference Include="EngineBay.Logging" Version="3.0.1" />
             </ItemGroup>
         </Otherwise>
     </Choose>
