@@ -9,10 +9,7 @@ namespace EngineBay.Persistence.Tests
 
         public static new void CreateDataAnnotations(ModelBuilder modelBuilder)
         {
-            if (modelBuilder is null)
-            {
-                throw new ArgumentNullException(nameof(modelBuilder));
-            }
+            ArgumentNullException.ThrowIfNull(modelBuilder);
 
             modelBuilder.Entity<MockEntity>().ToTable(typeof(MockEntity).Name.Pluralize());
 
