@@ -20,8 +20,11 @@ namespace EngineBay.Persistence
             services.AddDbContext<TDbContext>(
                 options =>
                 {
-                    options.UseSqlServer(connectionString, options =>
-                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
+                    options.UseSqlServer(
+                            connectionString,
+                            options =>
+                                options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
+                                    .EnableRetryOnFailure())
                         .WithExpressionExpanding();
 
                     if (sensitiveDataLoggingEnabled)
@@ -35,8 +38,11 @@ namespace EngineBay.Persistence
             services.AddDbContext<TDbQueryContext>(
                 options =>
                 {
-                    options.UseSqlServer(connectionString, options =>
-                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
+                    options.UseSqlServer(
+                            connectionString,
+                            options =>
+                                options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
+                                    .EnableRetryOnFailure())
                         .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
                         .WithExpressionExpanding();
 
@@ -51,8 +57,11 @@ namespace EngineBay.Persistence
             services.AddDbContext<TDbWriteContext>(
                 options =>
                 {
-                    options.UseSqlServer(connectionString, options =>
-                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
+                    options.UseSqlServer(
+                            connectionString,
+                            options =>
+                                options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
+                                    .EnableRetryOnFailure())
                         .WithExpressionExpanding()
                         .AddInterceptors(timestampInterceptor);
 
@@ -73,8 +82,11 @@ namespace EngineBay.Persistence
             services.AddDbContext<TDbContext>(
                 options =>
                 {
-                    options.UseNpgsql(connectionString, options =>
-                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
+                    options.UseNpgsql(
+                            connectionString,
+                            options =>
+                                options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
+                                    .EnableRetryOnFailure())
                         .WithExpressionExpanding();
 
                     if (sensitiveDataLoggingEnabled)
@@ -88,8 +100,11 @@ namespace EngineBay.Persistence
             services.AddDbContext<TDbQueryContext>(
                 options =>
                 {
-                    options.UseNpgsql(connectionString, options =>
-                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
+                    options.UseNpgsql(
+                            connectionString,
+                            options =>
+                                options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
+                                    .EnableRetryOnFailure())
                         .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
                         .WithExpressionExpanding();
 
@@ -104,8 +119,11 @@ namespace EngineBay.Persistence
             services.AddDbContext<TDbWriteContext>(
                 options =>
                 {
-                    options.UseNpgsql(connectionString, options =>
-                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery).EnableRetryOnFailure())
+                    options.UseNpgsql(
+                            connectionString,
+                            options =>
+                                options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
+                                    .EnableRetryOnFailure())
                         .WithExpressionExpanding()
                         .AddInterceptors(timestampInterceptor);
 
@@ -130,8 +148,10 @@ namespace EngineBay.Persistence
             services.AddDbContext<TDbContext>(
                 options =>
                 {
-                    options.UseSqlite(connection, options =>
-                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                    options.UseSqlite(
+                            connection,
+                            options =>
+                                options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                         .WithExpressionExpanding();
 
                     if (sensitiveDataLoggingEnabled)
@@ -145,8 +165,10 @@ namespace EngineBay.Persistence
             services.AddDbContext<TDbQueryContext>(
                 options =>
                 {
-                    options.UseSqlite(connection, options =>
-                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                    options.UseSqlite(
+                            connection,
+                            options =>
+                                options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                         .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
                         .WithExpressionExpanding();
 
@@ -161,8 +183,10 @@ namespace EngineBay.Persistence
             services.AddDbContext<TDbWriteContext>(
                 options =>
                 {
-                    options.UseSqlite(connection, options =>
-                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                    options.UseSqlite(
+                            connection,
+                            options =>
+                                options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                         .WithExpressionExpanding()
                         .AddInterceptors(timestampInterceptor);
 
@@ -183,8 +207,10 @@ namespace EngineBay.Persistence
             services.AddDbContext<TDbContext>(
                 options =>
                 {
-                    options.UseSqlite(connectionString, options =>
-                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                    options.UseSqlite(
+                            connectionString,
+                            options =>
+                                options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                         .WithExpressionExpanding();
 
                     if (sensitiveDataLoggingEnabled)
@@ -198,8 +224,10 @@ namespace EngineBay.Persistence
             services.AddDbContext<TDbQueryContext>(
                 options =>
                 {
-                    options.UseSqlite(connectionString, options =>
-                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                    options.UseSqlite(
+                            connectionString,
+                            options =>
+                                options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                         .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
                         .WithExpressionExpanding();
 
@@ -214,8 +242,10 @@ namespace EngineBay.Persistence
             services.AddDbContext<TDbWriteContext>(
                 options =>
                 {
-                    options.UseSqlite(connectionString, options =>
-                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                    options.UseSqlite(
+                            connectionString,
+                            options =>
+                                options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                         .WithExpressionExpanding()
                         .AddInterceptors(timestampInterceptor);
 
