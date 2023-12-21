@@ -9,10 +9,7 @@ namespace EngineBay.Persistence.Tests
 
         public static new void CreateDataAnnotations(ModelBuilder modelBuilder)
         {
-            if (modelBuilder is null)
-            {
-                throw new ArgumentNullException(nameof(modelBuilder));
-            }
+            ArgumentNullException.ThrowIfNull(modelBuilder);
 
             modelBuilder.Entity<MockEntity>().ToTable(typeof(MockEntity).Name.Pluralize());
 
@@ -22,11 +19,11 @@ namespace EngineBay.Persistence.Tests
 
             modelBuilder.Entity<MockEntity>().Property(x => x.LastUpdatedAt).IsRequired();
 
-            modelBuilder.Entity<MockEntity>().Property(x => x.CreatedById).IsRequired();
+            modelBuilder.Entity<MockEntity>().Property(x => x.CreatedById);
 
             modelBuilder.Entity<MockEntity>().HasOne(x => x.CreatedBy);
 
-            modelBuilder.Entity<MockEntity>().Property(x => x.LastUpdatedById).IsRequired();
+            modelBuilder.Entity<MockEntity>().Property(x => x.LastUpdatedById);
 
             modelBuilder.Entity<MockEntity>().HasOne(x => x.LastUpdatedBy);
 

@@ -138,42 +138,29 @@ namespace EngineBay.Persistence.Tests
         [Fact]
         public void ShouldExitAfterSeedingTrueEnvironmentVariableShouldReturnTrue()
         {
+            Environment.SetEnvironmentVariable(EnvironmentVariableConstants.DATABASEEXITAFTERSEEDING, "true");
+
             // Act
             var exitAfterSeeding = BaseDatabaseConfiguration.ShouldExitAfterSeeding();
 
+            Environment.SetEnvironmentVariable(EnvironmentVariableConstants.DATABASEEXITAFTERSEEDING, null);
+
+            // Assert
+            Assert.True(exitAfterSeeding);
+        }
+
+        [Fact]
+        public void ShouldExitAfterSeedingFalseEnvironmentVariableShouldReturnFalse()
+        {
+            Environment.SetEnvironmentVariable(EnvironmentVariableConstants.DATABASEEXITAFTERSEEDING, "false");
+
+            // Act
+            var exitAfterSeeding = BaseDatabaseConfiguration.ShouldExitAfterSeeding();
+
+            Environment.SetEnvironmentVariable(EnvironmentVariableConstants.DATABASEEXITAFTERSEEDING, null);
+
             // Assert
             Assert.False(exitAfterSeeding);
-        }
-
-        [Fact]
-        public void IsAuditingEnabledAuditingEnabledEnvironmentVariableSetToTrueReturnsTrue()
-        {
-            Environment.SetEnvironmentVariable(EnvironmentVariableConstants.DATABASEAUDITINGENABLED, "true");
-            bool actual = BaseDatabaseConfiguration.IsAuditingEnabled();
-            Assert.True(actual);
-        }
-
-        [Fact]
-        public void IsAuditingEnabledAuditingEnabledEnvironmentVariableSetToFalseReturnsFalse()
-        {
-            Environment.SetEnvironmentVariable(EnvironmentVariableConstants.DATABASEAUDITINGENABLED, "false");
-            bool actual = BaseDatabaseConfiguration.IsAuditingEnabled();
-            Assert.False(actual);
-        }
-
-        [Fact]
-        public void IsAuditingEnabledAuditingEnabledEnvironmentVariableNotSetReturnsTrue()
-        {
-            bool actual = BaseDatabaseConfiguration.IsAuditingEnabled();
-            Assert.True(actual);
-        }
-
-        [Fact]
-        public void IsAuditingEnabledAuditingEnabledEnvironmentVariableInvalidValueThrowsArgumentException()
-        {
-            Environment.SetEnvironmentVariable(EnvironmentVariableConstants.DATABASEAUDITINGENABLED, "invalid");
-            Assert.Throws<ArgumentException>(() => BaseDatabaseConfiguration.IsAuditingEnabled());
-            Environment.SetEnvironmentVariable(EnvironmentVariableConstants.DATABASEAUDITINGENABLED, null);
         }
     }
 }

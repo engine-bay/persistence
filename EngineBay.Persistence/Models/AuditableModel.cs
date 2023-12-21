@@ -2,7 +2,7 @@ namespace EngineBay.Persistence
 {
     using EngineBay.Core;
 
-    public class AuditableModel : BaseModel
+    public abstract class AuditableModel : BaseModel
     {
         public Guid? CreatedById { get; set; }
 

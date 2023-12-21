@@ -5,7 +5,7 @@ namespace EngineBay.Persistence.Tests
     public class MockModuleDbContext : ModuleWriteDbContext, IModuleWriteDbContext
     {
         public MockModuleDbContext(DbContextOptions<ModuleWriteDbContext> options)
-       : base(options)
+            : base(options)
         {
         }
 
@@ -16,6 +16,15 @@ namespace EngineBay.Persistence.Tests
             MockEntity.CreateDataAnnotations(modelBuilder);
 
             base.OnModelCreating(modelBuilder);
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            ArgumentNullException.ThrowIfNull(optionsBuilder);
+
+            optionsBuilder.AddInterceptors(new TimestampInterceptor());
+
+            base.OnConfiguring(optionsBuilder);
         }
     }
 }
