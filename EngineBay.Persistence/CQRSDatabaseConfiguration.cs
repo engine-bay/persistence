@@ -1,6 +1,5 @@
 namespace EngineBay.Persistence
 {
-    using EngineBay.Logging;
     using LinqKit;
     using Microsoft.Data.Sqlite;
     using Microsoft.EntityFrameworkCore;
@@ -13,7 +12,7 @@ namespace EngineBay.Persistence
     {
         protected override void ConfigureSqlServer(IServiceCollection services, string connectionString)
         {
-            var sensitiveDataLoggingEnabled = LoggingConfiguration.IsSensitiveDataLoggingEnabled();
+            var sensitiveDataLoggingEnabled = BaseDatabaseConfiguration.IsDetailedDatabaseLoggingEnabled();
             var timestampInterceptor = new TimestampInterceptor();
 
             // Register a general purpose db context that is not pooled
@@ -66,7 +65,7 @@ namespace EngineBay.Persistence
 
         protected override void ConfigurePostgres(IServiceCollection services, string connectionString)
         {
-            var sensitiveDataLoggingEnabled = LoggingConfiguration.IsSensitiveDataLoggingEnabled();
+            var sensitiveDataLoggingEnabled = BaseDatabaseConfiguration.IsDetailedDatabaseLoggingEnabled();
             var timestampInterceptor = new TimestampInterceptor();
 
             // Register a general purpose db context that is not pooled
@@ -119,8 +118,9 @@ namespace EngineBay.Persistence
 
         protected override void ConfigureInMemory(IServiceCollection services, string connectionString)
         {
-            var sensitiveDataLoggingEnabled = LoggingConfiguration.IsSensitiveDataLoggingEnabled();
+            var sensitiveDataLoggingEnabled = BaseDatabaseConfiguration.IsDetailedDatabaseLoggingEnabled();
             var timestampInterceptor = new TimestampInterceptor();
+
 #pragma warning disable CA2000 // We explicitly want to keep this conneciton open so that it is re-used each time by the dependency injection. When this connection is closed, the in-memory db is wiped.
             var connection = new SqliteConnection(connectionString);
 #pragma warning restore CA2000
@@ -176,7 +176,7 @@ namespace EngineBay.Persistence
 
         protected override void ConfigureSqlite(IServiceCollection services, string connectionString)
         {
-            var sensitiveDataLoggingEnabled = LoggingConfiguration.IsSensitiveDataLoggingEnabled();
+            var sensitiveDataLoggingEnabled = BaseDatabaseConfiguration.IsDetailedDatabaseLoggingEnabled();
             var timestampInterceptor = new TimestampInterceptor();
 
             // Register a general purpose db context

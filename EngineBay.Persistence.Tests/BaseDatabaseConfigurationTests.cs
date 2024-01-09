@@ -1,5 +1,6 @@
 namespace EngineBay.Persistence.Tests
 {
+    using Microsoft.Extensions.Logging;
     using Xunit;
 
     public class BaseDatabaseConfigurationTests
@@ -161,6 +162,22 @@ namespace EngineBay.Persistence.Tests
 
             // Assert
             Assert.False(exitAfterSeeding);
+        }
+
+        [Theory]
+        [InlineData(LogLevel.Trace, true)]
+        [InlineData(LogLevel.Debug, false)]
+        [InlineData(LogLevel.Information, false)]
+        [InlineData(LogLevel.Warning, false)]
+        [InlineData(LogLevel.Error, false)]
+        [InlineData(LogLevel.Critical, false)]
+        [InlineData(LogLevel.None, false)]
+        public void IsDetailedDatabaseLoggingEnabledEnvironmentVariableFalseShouldReturnFalse(
+            LogLevel loglevel,
+            bool expectedIsDetailedDatabaseLoggingEnabled)
+        {
+            Environment.SetEnvironmentVariable(EnvironmentVariableConstants.LOGGINGLEVEL, loglevel.ToString());
+            Assert.Equal(BaseDatabaseConfiguration.IsDetailedDatabaseLoggingEnabled(), expectedIsDetailedDatabaseLoggingEnabled);
         }
     }
 }

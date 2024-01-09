@@ -31,13 +31,11 @@
         <When Condition="'$(ASPNETCORE_ENVIRONMENT)' == 'Development'">
             <ItemGroup>
                 <ProjectReference Include="../../core/EngineBay.Core/EngineBay.Core.csproj" />
-                <ProjectReference Include="../../logging/EngineBay.Logging/EngineBay.Logging.csproj" />
             </ItemGroup>
         </When>
         <Otherwise>
             <ItemGroup>
-                <PackageReference Include="EngineBay.Core" Version="9.0.4" />
-                <PackageReference Include="EngineBay.Logging" Version="3.1.3" />
+                <PackageReference Include="EngineBay.Core" Version="*" />
             </ItemGroup>
         </Otherwise>
     </Choose>

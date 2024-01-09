@@ -133,6 +133,32 @@ namespace EngineBay.Persistence
             throw new ArgumentException($"Invalid {EnvironmentVariableConstants.DATABASECONNECTIONSTRING} configuration.");
         }
 
+        public static bool IsDetailedDatabaseLoggingEnabled()
+        {
+            var loggingLevelEnvironmentVariable = Environment.GetEnvironmentVariable(EnvironmentVariableConstants.LOGGINGLEVEL);
+
+            if (string.IsNullOrEmpty(loggingLevelEnvironmentVariable))
+            {
+                return false;
+            }
+
+            var loggingLevel = (LogLevel)Enum.Parse(typeof(LogLevel), loggingLevelEnvironmentVariable);
+
+            if (!Enum.IsDefined(typeof(LogLevel), loggingLevel) | loggingLevel.ToString().Contains(',', StringComparison.InvariantCulture))
+            {
+                Console.WriteLine($"Warning: '{loggingLevelEnvironmentVariable}' is not a valid {EnvironmentVariableConstants.LOGGINGLEVEL} configuration option. Valid options are: ");
+                foreach (string name in Enum.GetNames(typeof(LogLevel)))
+                {
+                    Console.Write(name);
+                    Console.Write(", ");
+                }
+
+                throw new ArgumentException($"Invalid {EnvironmentVariableConstants.LOGGINGLEVEL} configuration.");
+            }
+
+            return loggingLevel == LogLevel.Trace;
+        }
+
         public void RegisterDatabases(IServiceCollection services)
         {
             var databaseProvider = GetDatabaseProvider();
